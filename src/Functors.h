@@ -3,6 +3,8 @@
 
 #ifndef SWIG
 #include "math/Functions.h"
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 #endif
 
 
@@ -57,9 +59,21 @@ struct spowAmXpY_functor { // Y <- (A-X)^2 + Y
 
 	__host__ __device__
 	float operator()(float x, float y) { 
-		return pow(a-x, 2) + y;
+		//return pow(a-x, 2) + y;
+            return (a-x)*(a-x)+y;
 	}
 };
+
+// note: functor inherits from unary_function
+struct square_root// : public thrust::unary_function<float,float>
+{
+  __host__ __device__
+  float operator()(float x) const
+  {
+    return sqrtf(x);
+  }
+};
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 struct sm13bubble_functor {
@@ -122,7 +136,7 @@ struct sm13rad_decay_functor {
 	__host__ __device__
 	float operator()(float sigma0) {
 		float fLambda = fCycles / log(sigma0);
-		return pow(ANN::fcn_rad_decay(sigma0, fCycle, fLambda), 2);
+		return sqrt(pow(ANN::fcn_rad_decay(sigma0, fCycle, fLambda), 2));
 	}
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +175,7 @@ struct sm20distance_functor {
 
 	__host__ __device__
 	float operator()(float sigmaT, float dist) {
-		return (*m_pfunc)(sqrt(dist), sigmaT);
+		return (*m_pfunc)((dist), sigmaT);
 	}
 };
 #endif

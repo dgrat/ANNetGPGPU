@@ -201,6 +201,8 @@ void hostSOMPropagateBW( std::vector<SOMExport*> &SExp,
 				spowAmXpY_functor(BMU.dvBMUPos[y]) );
 		}
 
+                thrust::transform(dvDist.begin(), dvDist.end(), dvDist.begin(), square_root());
+		
 		// 1 b calc learning rate
 		thrust::device_vector<float> *dvLRate = SExp.at(iDevID)->dvLearningRate;
 		thrust::transform( dvLRate->begin(),						// input

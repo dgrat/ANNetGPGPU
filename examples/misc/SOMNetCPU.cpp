@@ -21,24 +21,31 @@ int main(int argc, char *argv[]) {
 
 	ANN::TrainingSet input;
 	input.AddInput(red);
-	input.AddInput(green);
-	input.AddInput(dk_green);
-	input.AddInput(blue);
-	input.AddInput(dk_blue);
-	input.AddInput(yellow);
-	input.AddInput(orange);
-	input.AddInput(purple);
-	input.AddInput(black);
-	input.AddInput(white);
 
 	std::vector<float> vCol(3);
 	int w1 = 64;
 	int w2 = 4;
 
 	ANN::SOMNet cpu;
+        cpu.SetLearningRate(1);
 	cpu.CreateSOM(3, 1, w1,w1);
 	cpu.SetTrainingSet(input);
-	cpu.Training(100, ANN::ANSerialMode);
+
+        // Clear initial weights
+        for(int x = 0; x < w1*w1; x++) {
+            ANN::SOMNeuron *pNeur = (ANN::SOMNeuron*)((ANN::SOMLayer*)cpu.GetOPLayer())->GetNeuron(x);
+            pNeur->GetConI(0)->SetValue(0); 
+            pNeur->GetConI(1)->SetValue(0); 
+            pNeur->GetConI(2)->SetValue(0); 
+            // Except for one unit.
+            if (x == 0) {
+                pNeur->GetConI(0)->SetValue(0.5); 
+                pNeur->GetConI(1)->SetValue(0.5); 
+                pNeur->GetConI(2)->SetValue(0.5); 
+            }
+        }
+        
+        cpu.Training(1);
 
 	SOMReader w(w1, w1, w2);
 	for(int x = 0; x < w1*w1; x++) {

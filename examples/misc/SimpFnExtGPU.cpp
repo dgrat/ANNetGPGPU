@@ -44,18 +44,36 @@ int main(int argc, char *argv[]) {
 	input.AddInput(white);
 
 	std::vector<float> vCol(3);
-	int w1 = 40;
+	int w1 = 120;
 	int w2 = 4;
 
 	SOMNetGPU gpu;
 	gpu.CreateSOM(3, 1, w1,w1);
 	gpu.SetTrainingSet(input);
 	
+	gpu.SetLearningRate(0.1);
+	//gpu.SetSigma0(25);
+	gpu.Training(500);
+        
 	SetFcn(&ownFn);
 	gpu.SetDistFunction(ownFn);
 	// or just: SetFcn(gpu.GetDistFunction() );
-
-	gpu.Training(1000);
+        
+        // Clear initial weights
+        for(int x = 0; x < w1*w1; x++) {
+            ANN::SOMNeuron *pNeur = (ANN::SOMNeuron*)((ANN::SOMLayer*)gpu.GetOPLayer())->GetNeuron(x);
+            pNeur->GetConI(0)->SetValue(0); 
+            pNeur->GetConI(1)->SetValue(0); 
+            pNeur->GetConI(2)->SetValue(0); 
+            // Except for one unit.
+            if (x == 820) {
+                pNeur->GetConI(0)->SetValue(1); 
+                pNeur->GetConI(1)->SetValue(1); 
+                pNeur->GetConI(2)->SetValue(1); 
+            }
+        }
+        
+	gpu.Training(1);
 
 	SOMReader w(w1, w1, w2);
 	for(int x = 0; x < w1*w1; x++) {
