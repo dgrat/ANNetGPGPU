@@ -10,11 +10,10 @@
 #     Daniel <dgrat> Frenzel - initial API and implementation
 #-------------------------------------------------------------------------------
 */
+#pragma once
 
-#ifndef SOMPIXMAP_H
-#define SOMPIXMAP_H
-
-#include <QtGui>
+#include <QtWidgets>
+#include <QApplication>
 
 
 class SOMReader : public QLabel {
@@ -43,4 +42,3 @@ public slots:
 	void SetField(const QPoint &pField, const std::vector<float> &vColor);
 };
 
-#endif // SOMPIXMAP_H

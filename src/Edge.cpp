@@ -41,7 +41,7 @@ Edge<Type>::Edge(AbsNeuron<Type> *first, AbsNeuron<Type> *second) {
 	m_pNeuronFirst 		= first;
 	m_pNeuronSecond 	= second;
 
-	m_fWeight 		= RandFloat(-0.5f, 0.5f);
+	m_fWeight 		= GetRandReal(-0.5f, 0.5f);
 	m_bAllowAdaptation 	= true;
 	m_fMomentum 		= 0.f;
 }

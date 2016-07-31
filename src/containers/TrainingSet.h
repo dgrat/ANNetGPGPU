@@ -53,5 +53,7 @@ public:
 	void ImpFromFS(BZFILE* bz2in, int iBZ2Error);
 };
 
+#include "TrainingSet.tpp"
+
 }
 

@@ -1,12 +1,7 @@
-/*
- * AbsNet.cpp
- *
- *  Created on: 16.02.2011
- *      Author: dgrat
- */
 #include <iostream>
 #include <cassert>
 #include <omp.h>
+#include <cmath>
 //own classes
 #include "AbsNeuron.h"
 #include "AbsLayer.h"
@@ -16,7 +11,6 @@
 #include "containers/TrainingSet.h"
 #include "containers/ConTable.h"
 #include "math/Random.h"
-#include "math/Functions.h"
 
 
 using namespace ANN;
@@ -24,45 +18,36 @@ using namespace ANN;
 
 template <class Type>
 AbsNet<Type>::AbsNet() //: Importer(this),  Exporter(this)
-{
-	m_fLearningRate = 0.0f;
-	m_fMomentum 	= 0.f;
-	m_fWeightDecay 	= 0.f;
-	m_pTransfFunction 	= NULL;
+{	
 	m_pTrainingData = NULL;
-
-	m_pIPLayer 		= NULL;
-	m_pOPLayer 		= NULL;
-
+	m_pIPLayer 	= NULL;
+	m_pOPLayer 	= NULL;
 	m_fTypeFlag 	= ANNetUndefined;
-
-	// Init time for rdom numbers
-	INIT_TIME
 }
 
 template <class Type>
-void AbsNet<Type>::CreateNet(const ConTable &Net) {
+void AbsNet<Type>::CreateNet(const ConTable<Type> &Net) {
 	std::cout<<"Create AbsNet()"<<std::endl;
 
 	/*
 	 * Initialisiere Variablen
 	 */
-	unsigned int iNmbLayers 	= Net.NrOfLayers;	// zahl der Layer im Netz
-	unsigned int iNmbNeurons	= 0;
+	unsigned int iNmbLayers = Net.NrOfLayers;	// zahl der Layer im Netz
+	unsigned int iNmbNeurons = 0;
 
-	unsigned int iDstNeurID 	= 0;
-	unsigned int iSrcNeurID 	= 0;
-	unsigned int iDstLayerID 	= 0;
-	unsigned int iSrcLayerID 	= 0;
+	unsigned int iDstNeurID = 0;
+	unsigned int iSrcNeurID = 0;
+	unsigned int iDstLayerID = 0;
+	unsigned int iSrcLayerID = 0;
 
-	Type fEdgeValue			= 0.f;
+	Type fEdgeValue = 0.f;
 
-	AbsLayer<Type> *pDstLayer 	= NULL;
-	AbsLayer<Type> *pSrcLayer 	= NULL;
-	AbsNeuron<Type> *pDstNeur 	= NULL;
-	AbsNeuron<Type> *pSrcNeur 	= NULL;
+	AbsLayer<Type> *pDstLayer = NULL;
+	AbsLayer<Type> *pSrcLayer = NULL;
+	AbsNeuron<Type> *pDstNeur = NULL;
+	AbsNeuron<Type> *pSrcNeur = NULL;
 
-	LayerTypeFlag fType 		= 0;
+	LayerTypeFlag fType = 0;
 
 	/*
 	 *	Delete existing network in memory
@@ -73,10 +58,10 @@ void AbsNet<Type>::CreateNet(const ConTable &Net) {
 	/*
 	 * Create the layers ..
 	 */
-	std::cout<<"Adding layers ";
+	std::cout << "Adding " << iNmbLayers << " layers ";
 	for(unsigned int i = 0; i < iNmbLayers; i++) {
 		iNmbNeurons = Net.SizeOfLayer.at(i);
-		fType 		= Net.TypeOfLayer.at(i);
+		fType = Net.TypeOfLayer.at(i);
 
 		// Create layers
 		AddLayer(iNmbNeurons, fType);
@@ -98,39 +83,39 @@ void AbsNet<Type>::CreateNet(const ConTable &Net) {
 	/*
 	 * Basic information for ~all networks
 	 */
-	std::cout<<"Adding edges ";
+	std::cout << "Adding " << Net.NeurCons.size() << " edges ";
 	for(unsigned int i = 0; i < Net.NeurCons.size(); i++) {
 		/*
 		 * Read settings
 		 */
-		iDstNeurID 	= Net.NeurCons.at(i).m_iDstNeurID;
-		iSrcNeurID 	= Net.NeurCons.at(i).m_iSrcNeurID;
+		iDstNeurID = Net.NeurCons.at(i).m_iDstNeurID;
+		iSrcNeurID = Net.NeurCons.at(i).m_iSrcNeurID;
 		iDstLayerID = Net.NeurCons.at(i).m_iDstLayerID;
 		iSrcLayerID = Net.NeurCons.at(i).m_iSrcLayerID;
 
 		/*
 		 * Check whether all settings are usable
 		 */
-		assert(iDstNeurID 	>= 0);
-		assert(iSrcNeurID 	>= 0);
-		assert(iDstLayerID 	>= 0);
-		assert(iSrcLayerID 	>= 0);
+		assert(iDstNeurID >= 0);
+		assert(iSrcNeurID >= 0);
+		assert(iDstLayerID >= 0);
+		assert(iSrcLayerID >= 0);
 		assert(i < Net.NeurCons.size());
 
 		/*
 		 * Create edges and register in neurons
 		 */
-		fEdgeValue 	= Net.NeurCons.at(i).m_fVal;
-		pDstLayer 	= GetLayer(iDstLayerID);
-		pSrcLayer 	= GetLayer(iSrcLayerID);
-		pDstNeur 	= pDstLayer->GetNeuron(iDstNeurID);
-		pSrcNeur 	= pSrcLayer->GetNeuron(iSrcNeurID);
-
+		fEdgeValue = Net.NeurCons.at(i).m_fVal;
+		pDstLayer = GetLayer(iDstLayerID);
+		pSrcLayer = GetLayer(iSrcLayerID);
+		pDstNeur = pDstLayer->GetNeuron(iDstNeurID);
+		pSrcNeur = pSrcLayer->GetNeuron(iSrcNeurID);
+		
 		// Check for NULL pointers
-		assert(pDstLayer 	!= NULL);
-		assert(pSrcLayer 	!= NULL);
-		assert(pDstNeur 	!= NULL);
-		assert(pSrcNeur 	!= NULL);
+		assert(pDstLayer != NULL);
+		assert(pSrcLayer != NULL);
+		assert(pDstNeur != NULL);
+		assert(pSrcNeur != NULL);
 
 		//Connect neurons with edge
 		ANN::Connect<Type>(pSrcNeur, pDstNeur, fEdgeValue, 0.f, true);
@@ -408,29 +393,6 @@ std::vector<Type> AbsNet<Type>::GetOutput() {
 }
 
 template <class Type>
-void AbsNet<Type>::SetTransfFunction(const TransfFunction *pFunction) {
-	assert( pFunction != 0 );
-
-	m_pTransfFunction = const_cast<TransfFunction *>(pFunction);
-	for(unsigned int i = 0; i < m_lLayers.size(); i++) {
-		GetLayer(i)->SetNetFunction(m_pTransfFunction);
-	}
-}
-
-template <class Type>
-void AbsNet<Type>::SetTransfFunction(const TransfFunction &pFunction) {
-	m_pTransfFunction = const_cast<TransfFunction *>(&pFunction);
-	for(unsigned int i = 0; i < m_lLayers.size(); i++) {
-		GetLayer(i)->SetNetFunction(m_pTransfFunction);
-	}
-}
-
-template <class Type>
-TransfFunction *AbsNet<Type>::GetTransfFunction() {
-	return m_pTransfFunction;
-}
-
-template <class Type>
 void AbsNet<Type>::ExpToFS(std::string path) {
 	int iBZ2Error;
 	NetTypeFlag fNetType 		= GetFlag();
@@ -466,7 +428,7 @@ void AbsNet<Type>::ExpToFS(std::string path) {
 template <class Type>
 void AbsNet<Type>::ImpFromFS(std::string path) {
 	int iBZ2Error;
-	ConTable Table;
+	ConTable<Type> Table;
 	NetTypeFlag fNetType 		= 0;
 	unsigned int iNmbOfLayers 	= 0;
 

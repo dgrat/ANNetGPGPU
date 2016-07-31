@@ -5,13 +5,6 @@
  *      Author: dgrat
  */
 
-#include <cassert>
-#include <cstddef>
-// own classes
-#include "TrainingSet.h"
-
-using namespace ANN;
-
 
 template <class Type>
 TrainingSet<Type>::TrainingSet() {
@@ -140,12 +133,3 @@ void TrainingSet<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error) {
 		m_vOutputList.push_back(vOut);
 	}
 }
-
-
-template class TrainingSet<float>;
-template class TrainingSet<double>;
-template class TrainingSet<long double>;
-template class TrainingSet<short>;
-template class TrainingSet<int>;
-template class TrainingSet<long>;
-template class TrainingSet<long long>;

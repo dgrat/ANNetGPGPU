@@ -16,24 +16,18 @@
 
 
 int main(int argc, char *argv[]) {
-	ANN::BPNet<float> cpu_one;
+	ANN::BPNet<float, ANN::fcn_log<float>> cpu_one;
 
-	ANN::BPLayer<float> layer1(56, ANN::ANLayerInput);
-        ANN::BPLayer<float> layer2(64, ANN::ANLayerHidden);
-        ANN::BPLayer<float> layer3(64, ANN::ANLayerHidden);
-        ANN::BPLayer<float> layer4(64, ANN::ANLayerHidden);
-	ANN::BPLayer<float> layer5(9, ANN::ANLayerOutput);
+	ANN::BPLayer<float, ANN::fcn_log<float>> layer1(56, ANN::ANLayerInput);
+        ANN::BPLayer<float, ANN::fcn_log<float>> layer2(64, ANN::ANLayerHidden);
+	ANN::BPLayer<float, ANN::fcn_log<float>> layer3(9, ANN::ANLayerOutput);
 
 	layer1.ConnectLayer(&layer2);
 	layer2.ConnectLayer(&layer3);
-        layer3.ConnectLayer(&layer4);
-        layer4.ConnectLayer(&layer5);
         
 	cpu_one.AddLayer(&layer1);
 	cpu_one.AddLayer(&layer2);
         cpu_one.AddLayer(&layer3);
-        cpu_one.AddLayer(&layer4);
-        cpu_one.AddLayer(&layer5);
 
 	ANN::TrainingSet<float> input;
 	input.AddInput(fInp1, 56);
@@ -58,21 +52,21 @@ int main(int argc, char *argv[]) {
 	input.AddOutput(fOut10, 9);
 	
 	std::vector<float> errors;
-	cpu_one.SetLearningRate(0.5);
-	cpu_one.SetMomentum(0);
-	cpu_one.SetWeightDecay(0);
+	
+	ANN::HebbianConf<float> conf = {0.5, 0, 0};
+	cpu_one.Setup(conf);
 	cpu_one.SetTrainingSet(input);
 
 	bool b = false;
 	float f;
-	errors = cpu_one.TrainFromData(300, 0, b, f);
+	errors = cpu_one.TrainFromData(50, 0, b, f);
 	std::cout<< &cpu_one <<std::endl;
-/*
-	cpu_one.ExpToFS("foo.bar");
-	cpu_one.ImpFromFS("foo.bar");
 
-	cpu_one.SetTrainingSet(input);
-	std::cout<< cpu_one <<std::endl;
-*/
+	cpu_one.ExpToFS("foo.bar");
+	ANN::BPNet<float, ANN::fcn_log<float>> cpu_two;
+	cpu_two.ImpFromFS("foo.bar");
+	cpu_two.SetTrainingSet(input);
+	
+	std::cout<< &cpu_two <<std::endl;
 	return 0;
 }

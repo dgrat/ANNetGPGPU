@@ -1,33 +1,24 @@
-/*
- * AbsNeuron.cpp
- *
- *  Created on: 01.09.2010
- *      Author: dgrat
- */
 #include "AbsNeuron.h"
 #include "AbsLayer.h"
 #include "Edge.h"
 #include "containers/TrainingSet.h"
 #include "containers/ConTable.h"
 #include "math/Random.h"
-#include "math/Functions.h"
 
 using namespace ANN;
 
 
 template <class Type>
 AbsNeuron<Type>::AbsNeuron() {
-	m_fValue = RandFloat(-0.5f, 0.5f);
+	m_fValue = GetRandReal(-0.5f, 0.5f);
 	m_fErrorDelta = 0;
-	m_pBias = NULL;
 	m_pParentLayer = NULL;
 }
 
 template <class Type>
 AbsNeuron<Type>::AbsNeuron(AbsLayer<Type> *parentLayer) : m_pParentLayer(parentLayer) {
-	m_fValue = RandFloat(-0.5f, 0.5f);
+	m_fValue = GetRandReal(-0.5f, 0.5f);
 	m_fErrorDelta = 0;
-	m_pBias = NULL;
 }
 
 template <class Type>
@@ -115,11 +106,6 @@ void AbsNeuron<Type>::SetErrorDelta(const Type &value)
 }
 
 template <class Type>
-void AbsNeuron<Type>::SetBiasEdge(Edge<Type> *Edge) {
-	m_pBias = Edge;
-}
-
-template <class Type>
 const Type &AbsNeuron<Type>::GetValue() const {
 	return m_fValue;
 }
@@ -140,23 +126,8 @@ const Type &AbsNeuron<Type>::GetErrorDelta() const {
 }
 
 template <class Type>
-Edge<Type> *AbsNeuron<Type>::GetBiasEdge() const {
-	return m_pBias;
-}
-
-template <class Type>
 AbsLayer<Type> *AbsNeuron<Type>::GetParent() const {
 	return m_pParentLayer;
-}
-
-template <class Type>
-void AbsNeuron<Type>::SetTransfFunction (const TransfFunction *pFCN) {
-	this->m_ActFunction = const_cast<TransfFunction *>(pFCN);
-}
-
-template <class Type>
-const TransfFunction *AbsNeuron<Type>::GetTransfFunction() const {
-	return (m_ActFunction);
 }
 
 template <class Type>
@@ -166,13 +137,13 @@ AbsNeuron<Type>::operator Type() const {
 
 template <class Type>
 void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
-	unsigned int iNmbDims 		= this->GetPosition().size();
-	unsigned int iNmbOfConnects 	= this->GetConsO().size();
-	int iSrcNeurID 			= this->GetID();
+	unsigned int iNmbDims = this->GetPosition().size();
+	unsigned int iNmbOfConnects = this->GetConsO().size();
+	int iSrcNeurID = this->GetID();
 
-	Type fEdgeValue 	= 0.f;
-	int iDstLayerID 	= -1;
-	int iDstNeurID 		= -1;
+	Type fEdgeValue = 0.f;
+	int iDstLayerID = -1;
+	int iDstNeurID = -1;
 
 	BZ2_bzWrite( &iBZ2Error, bz2out, &iSrcNeurID, sizeof(int) );
 	/*
@@ -200,16 +171,16 @@ void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
 }
 
 template <class Type>
-void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable &Table) {
-	unsigned int 	iNmbDims 		= 0;
-	unsigned int 	iNmbOfConnects 	= 0;
+void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Table) {
+	unsigned int iNmbDims = 0;
+	unsigned int iNmbOfConnects = 0;
 
 	std::vector<Type> vNeuronPos;
 
-	Type fEdgeValue 	= 0.0f;
-	int iDstLayerID 	= -1;
-	int iDstNeurID 		= -1;
-	int iSrcNeurID 		= -1;
+	Type fEdgeValue = 0.0f;
+	int iDstLayerID = -1;
+	int iDstNeurID = -1;
+	int iSrcNeurID = -1;
 
 	BZ2_bzRead( &iBZ2Error, bz2in, &iSrcNeurID, sizeof(int) );
 	/*
@@ -236,12 +207,12 @@ void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable &Table) {
 		BZ2_bzRead( &iBZ2Error, bz2in, &iDstLayerID, sizeof(int) );
 		BZ2_bzRead( &iBZ2Error, bz2in, &iDstNeurID, sizeof(int) );
 		BZ2_bzRead( &iBZ2Error, bz2in, &fEdgeValue, sizeof(Type) );
-		ConDescr cCurCon;
-		cCurCon.m_fVal 		= fEdgeValue;
-		cCurCon.m_iSrcNeurID 	= iSrcNeurID;
-		cCurCon.m_iDstNeurID 	= iDstNeurID;
-		cCurCon.m_iSrcLayerID 	= Table.Neurons.back().m_iLayerID;	// current array always equal to current index, so valid
-		cCurCon.m_iDstLayerID 	= iDstLayerID;						// last chge
+		ConDescr<Type> cCurCon;
+		cCurCon.m_fVal = fEdgeValue;
+		cCurCon.m_iSrcNeurID = iSrcNeurID;
+		cCurCon.m_iDstNeurID = iDstNeurID;
+		cCurCon.m_iSrcLayerID = Table.Neurons.back().m_iLayerID;	// current array always equal to current index, so valid
+		cCurCon.m_iDstLayerID = iDstLayerID;						// last chge
 		Table.NeurCons.push_back(cCurCon);
 	}
 }

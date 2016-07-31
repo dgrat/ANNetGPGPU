@@ -1,14 +1,7 @@
-/*
- * AbsLayer.cpp
- *
- *  Created on: 21.02.2011
- *      Author: dgrat
- */
 #include "AbsLayer.h"
 #include "AbsNeuron.h"
 #include "Edge.h"
 #include "containers/ConTable.h"
-#include "math/Functions.h"
 
 #include <iostream>
 #include <cassert>
@@ -75,15 +68,6 @@ AbsNeuron<Type> *AbsLayer<Type>::GetNeuron(const unsigned int &iID) const {
 }
 
 template <class Type>
-void AbsLayer<Type>::SetNetFunction(const TransfFunction *pFunction) {
-	assert( pFunction != 0 );
-	#pragma omp parallel for
-	for(int j = 0; j < static_cast<int>( m_lNeurons.size() ); j++) {
-		m_lNeurons[j]->SetTransfFunction(pFunction);
-	}
-}
-
-template <class Type>
 void AbsLayer<Type>::SetFlag(const LayerTypeFlag &fType) {
 	m_fTypeFlag = fType;
 }
@@ -101,16 +85,16 @@ LayerTypeFlag AbsLayer<Type>::GetFlag() const {
 
 template <class Type>
 void AbsLayer<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
-	int iLayerID 				= GetID();
+	int iLayerID = GetID();
 	BZ2_bzWrite( &iBZ2Error, bz2out, &iLayerID, sizeof(int) );
 
 	std::cout<<"Save AbsLayer to FS()"<<std::endl;
 
-	LayerTypeFlag 	fLayerType 	= GetFlag();
-	unsigned int iNmbOfNeurons 	= this->GetNeurons().size();
+	LayerTypeFlag fLayerType = GetFlag();
+	unsigned int iNmbOfNeurons = this->GetNeurons().size();
 
 	BZ2_bzWrite( &iBZ2Error, bz2out, &fLayerType, sizeof(LayerTypeFlag) );	// Type of layer
-	BZ2_bzWrite( &iBZ2Error, bz2out, &iNmbOfNeurons, sizeof(int) );			// Number of neuron in this layer (except bias)
+	BZ2_bzWrite( &iBZ2Error, bz2out, &iNmbOfNeurons, sizeof(int) );		// Number of neuron in this layer (except bias)
 	for(unsigned int j = 0; j < iNmbOfNeurons; j++) {
 		AbsNeuron<Type> *pCurNeur = this->GetNeuron(j);
 		pCurNeur->ExpToFS(bz2out, iBZ2Error);
@@ -118,14 +102,14 @@ void AbsLayer<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
 }
 
 template <class Type>
-int AbsLayer<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable &Table) {
-	int iLayerID 				= -1;
+int AbsLayer<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Table) {
+	int iLayerID = -1;
 	BZ2_bzRead( &iBZ2Error, bz2in, &iLayerID, sizeof(int) );
 
 	std::cout<<"Load AbsLayer from FS()"<<std::endl;
 
-	LayerTypeFlag 	fLayerType 	= 0;
-	unsigned int iNmbOfNeurons 	= 0;
+	LayerTypeFlag fLayerType = 0;
+	unsigned int iNmbOfNeurons = 0;
 
 	BZ2_bzRead( &iBZ2Error, bz2in, &fLayerType, sizeof(LayerTypeFlag) );
 	BZ2_bzRead( &iBZ2Error, bz2in, &iNmbOfNeurons, sizeof(int) );
@@ -133,9 +117,9 @@ int AbsLayer<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable &Table) {
 	Table.SizeOfLayer.push_back(iNmbOfNeurons);
 
 	for(unsigned int j = 0; j < iNmbOfNeurons; j++) {
-		AddNeurons(1);	// Create dummy neuron; more neurons than needed don't disturb, but are necessary if using empty nets
+		AddNeurons(1); // Create dummy neuron; more neurons than needed don't disturb, but are necessary if using empty nets
 
-		NeurDescr 	cCurNeur;
+		NeurDescr<Type> cCurNeur;
 		cCurNeur.m_iLayerID = iLayerID;
 		Table.Neurons.push_back(cCurNeur);
 		AbsNeuron<Type> *pCurNeur = this->GetNeuron(j);
@@ -146,13 +130,13 @@ int AbsLayer<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable &Table) {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpEdgesIn() const {
+F2DArray<Type> AbsLayer<Type>::ExpEdgesIn() const {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsI().size();
 	unsigned int iWidth 	= m_lNeurons.size();
 
 	assert(iWidth > 0 && iHeight > 0);
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 
 	#pragma omp parallel for
@@ -165,7 +149,7 @@ F2DArray AbsLayer<Type>::ExpEdgesIn() const {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpEdgesIn(int iStart, int iStop) const {
+F2DArray<Type> AbsLayer<Type>::ExpEdgesIn(int iStart, int iStop) const {
 	unsigned int iWidth 	= iStop-iStart+1;
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsI().size();
 
@@ -173,7 +157,7 @@ F2DArray AbsLayer<Type>::ExpEdgesIn(int iStart, int iStop) const {
 	assert(iStart >= 0);
 	assert(iStop < m_lNeurons.size() );
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 	
 	#pragma omp parallel for
@@ -188,13 +172,13 @@ F2DArray AbsLayer<Type>::ExpEdgesIn(int iStart, int iStop) const {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpEdgesOut() const {
+F2DArray<Type> AbsLayer<Type>::ExpEdgesOut() const {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsO().size();
 	unsigned int iWidth 	= m_lNeurons.size();
 
 	assert(iWidth > 0 && iHeight > 0);
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 
 	#pragma omp parallel for
@@ -207,7 +191,7 @@ F2DArray AbsLayer<Type>::ExpEdgesOut() const {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpEdgesOut(int iStart, int iStop) const {
+F2DArray<Type> AbsLayer<Type>::ExpEdgesOut(int iStart, int iStop) const {
 	unsigned int iWidth 	= iStop-iStart+1;
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsO().size();
 
@@ -215,7 +199,7 @@ F2DArray AbsLayer<Type>::ExpEdgesOut(int iStart, int iStop) const {
 	assert(iStart >= 0);
 	assert(iStop < m_lNeurons.size() );
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 	
 	#pragma omp parallel for
@@ -230,7 +214,7 @@ F2DArray AbsLayer<Type>::ExpEdgesOut(int iStart, int iStop) const {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpEdgesIn(const F2DArray &mat) {
+void AbsLayer<Type>::ImpEdgesIn(const F2DArray<Type> &mat) {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsI().size();
 	unsigned int iWidth 	= m_lNeurons.size();
 
@@ -246,7 +230,7 @@ void AbsLayer<Type>::ImpEdgesIn(const F2DArray &mat) {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpEdgesIn(const F2DArray &mat, int iStart, int iStop) {
+void AbsLayer<Type>::ImpEdgesIn(const F2DArray<Type> &mat, int iStart, int iStop) {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsI().size();
 	
 	assert(iHeight == mat.GetH() );
@@ -263,7 +247,7 @@ void AbsLayer<Type>::ImpEdgesIn(const F2DArray &mat, int iStart, int iStop) {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpEdgesOut(const F2DArray &mat) {
+void AbsLayer<Type>::ImpEdgesOut(const F2DArray<Type> &mat) {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsO().size();
 	unsigned int iWidth 	= m_lNeurons.size();
 
@@ -279,7 +263,7 @@ void AbsLayer<Type>::ImpEdgesOut(const F2DArray &mat) {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpEdgesOut(const F2DArray &mat, int iStart, int iStop) {
+void AbsLayer<Type>::ImpEdgesOut(const F2DArray<Type> &mat, int iStart, int iStop) {
 	unsigned int iHeight 	= m_lNeurons.front()->GetConsO().size();
 	
 	assert(iHeight == mat.GetH() );
@@ -296,13 +280,13 @@ void AbsLayer<Type>::ImpEdgesOut(const F2DArray &mat, int iStart, int iStop) {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpPositions() const {
+F2DArray<Type> AbsLayer<Type>::ExpPositions() const {
 	unsigned int iHeight 	= m_lNeurons.at(0)->GetPosition().size();
 	unsigned int iWidth 	= m_lNeurons.size();
 	
 	assert(iWidth > 0 && iHeight > 0);
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 
 	#pragma omp parallel for
@@ -315,7 +299,7 @@ F2DArray AbsLayer<Type>::ExpPositions() const {
 }
 
 template <class Type>
-F2DArray AbsLayer<Type>::ExpPositions(int iStart, int iStop) const {
+F2DArray<Type> AbsLayer<Type>::ExpPositions(int iStart, int iStop) const {
 	unsigned int iHeight 	= m_lNeurons.at(0)->GetPosition().size();
 	unsigned int iWidth 	= iStop-iStart+1;
 
@@ -323,7 +307,7 @@ F2DArray AbsLayer<Type>::ExpPositions(int iStart, int iStop) const {
 	assert(iStart >= 0);
 	assert(iStop < m_lNeurons.size() );
 
-	F2DArray vRes;
+	F2DArray<Type> vRes;
 	vRes.Alloc(iWidth, iHeight);
 
 	#pragma omp parallel for
@@ -338,7 +322,7 @@ F2DArray AbsLayer<Type>::ExpPositions(int iStart, int iStop) const {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpPositions(const F2DArray &f2dPos) {
+void AbsLayer<Type>::ImpPositions(const F2DArray<Type> &f2dPos) {
 	unsigned int iHeight = f2dPos.GetH();
 	unsigned int iWidth = f2dPos.GetW();
 
@@ -355,7 +339,7 @@ void AbsLayer<Type>::ImpPositions(const F2DArray &f2dPos) {
 }
 
 template <class Type>
-void AbsLayer<Type>::ImpPositions(const F2DArray &f2dPos, int iStart, int iStop) {
+void AbsLayer<Type>::ImpPositions(const F2DArray<Type> &f2dPos, int iStart, int iStop) {
 	unsigned int iHeight = f2dPos.GetH();
 	unsigned int iWidth = f2dPos.GetW();
 
