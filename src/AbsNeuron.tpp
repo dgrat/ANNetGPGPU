@@ -35,6 +35,20 @@ AbsNeuron<Type>::AbsNeuron(const AbsNeuron<Type> *pNeuron) {
 
 template <class Type>
 AbsNeuron<Type>::~AbsNeuron() {
+	for(int i = 0; i < m_lIncomingConnections.size(); i++) {
+		if(!m_lIncomingConnections.at(i)) {
+			continue;
+		}
+		delete m_lIncomingConnections.at(i);
+	}
+	
+	for(int i = 0; i < m_lOutgoingConnections.size(); i++) {
+		if(!m_lOutgoingConnections.at(i)) {
+			continue;
+		}
+		delete m_lOutgoingConnections.at(i);
+	}
+	
 	m_lIncomingConnections.clear();
 	m_lOutgoingConnections.clear();
 }

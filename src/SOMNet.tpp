@@ -124,7 +124,15 @@ void SOMNet<Type, Functor>::CreateNet(const ConTable<Type> &Net) {
 
 template<class Type, class Functor>
 SOMNet<Type, Functor>::~SOMNet() {
-	// TODO Auto-generated destructor stub
+	AbsNet<Type>::EraseAll();
+/*
+	if(this->m_pIPLayer) {
+		delete this->m_pIPLayer;
+	}
+	if(this->m_pIPLayer) {
+		delete this->m_pIPLayer;
+	}
+*/
 }
 
 template<class Type, class Functor>

@@ -8,6 +8,18 @@ AbsNet<Type>::AbsNet() //: Importer(this),  Exporter(this)
 }
 
 template <class Type>
+AbsNet<Type>::~AbsNet() {
+	EraseAll();
+
+	if(m_pIPLayer) {
+		delete m_pIPLayer;
+	}
+	if(m_pOPLayer) {
+		delete m_pOPLayer;
+	}
+}
+
+template <class Type>
 void AbsNet<Type>::CreateNet(const ConTable<Type> &Net) {
 	std::cout<<"Create AbsNet()"<<std::endl;
 
@@ -99,11 +111,6 @@ void AbsNet<Type>::CreateNet(const ConTable<Type> &Net) {
 		ANN::Connect<Type>(pSrcNeur, pDstNeur, fEdgeValue, 0.f, true);
 	}
 	std::cout<<".. finished!"<<std::endl;
-}
-
-template <class Type>
-AbsNet<Type>::~AbsNet() {
-	EraseAll();
 }
 
 template <class Type>

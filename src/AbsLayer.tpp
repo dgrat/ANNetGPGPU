@@ -34,7 +34,7 @@ template <class Type>
 void AbsLayer<Type>::EraseAll() {
 	for(unsigned int i = 0; i < m_lNeurons.size(); i++) {
 		m_lNeurons[i]->EraseAllEdges();
-		delete m_lNeurons[i];
+		delete m_lNeurons.at(i);
 	}
 	m_lNeurons.clear();
 }

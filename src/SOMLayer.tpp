@@ -49,7 +49,13 @@ SOMLayer<Type>::SOMLayer(const std::vector<unsigned int> &vDim, LayerTypeFlag fT
 
 template <class Type>
 SOMLayer<Type>::~SOMLayer() {
-	// TODO Auto-generated destructor stub
+	for(int i = 0; i < this->m_lNeurons.size(); i++) {
+		if(!this->m_lNeurons.at(i)) {
+			continue;
+		}
+		delete this->m_lNeurons.at(i);
+	}
+	this->m_lNeurons.clear();
 }
 
 template <class Type>
