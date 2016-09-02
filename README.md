@@ -21,6 +21,9 @@ int main(int argc, char *argv[]) {
 # Projects
 ## Artwork from Ben Bogart
 
+[![Image deconstruction](http://www.ekran.org/ben/wp/wp-content/uploads/2016/06/Bogart-Platforms-Coastal-City-In-Progress.jpg)](https://vimeo.com/181111922 "Image deconstruction - Click to Watch!")
+__This video is from [ekran.org](http://www.ekran.org/ben/wp/2016/results-without-segmentation/#more-3490) and shows a panorama after several training cycles of a SOM__
+
 ![artw_i](http://www.ekran.org/ben/wp/wp-content/uploads/2016/05/SOMResults_noSegmentation_SOMScale5_h1352_ns200_i1000000-scaler8.jpg)
 __This image is from [ekran.org](http://www.ekran.org/ben/wp/2016/results-without-segmentation/#more-3490) and shows a panorama after several training cycles of a SOM__
 
