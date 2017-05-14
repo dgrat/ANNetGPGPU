@@ -40,7 +40,7 @@ void BPNeuron<Type, Functor>::CalcValue() {
 	}
 
 	Type val = 0;
-	for(unsigned int i = 0; i < this->GetConsI().size(); i++) {
+	for(uint32_t i = 0; i < this->GetConsI().size(); i++) {
 		AbsNeuron<Type> *from = this->GetConI(i)->GetDestination(this);
 		val += from->GetValue() * this->GetConI(i)->GetValue();
 	}
@@ -56,12 +56,12 @@ void BPNeuron<Type, Functor>::AdaptEdges() {
 		return;
 
 	AbsNeuron<Type> *pCurNeuron;
-	Edge<Type> 	*pCurEdge;
-	Type 		val;
+	Edge<Type> *pCurEdge;
+	Type val;
 
 	// calc error deltas
 	val = this->GetErrorDelta();
-	for(unsigned int i = 0; i < this->GetConsO().size(); i++) {
+	for(uint32_t i = 0; i < this->GetConsO().size(); i++) {
 		pCurEdge 	= this->GetConO(i);
 		pCurNeuron 	= pCurEdge->GetDestination(this);
 		val += pCurNeuron->GetErrorDelta() * pCurEdge->GetValue();
@@ -71,7 +71,7 @@ void BPNeuron<Type, Functor>::AdaptEdges() {
 	this->SetErrorDelta(val);
 
 	// adapt weights
-	for(unsigned int i = 0; i < this->GetConsO().size(); i++) {
+	for(uint32_t i = 0; i < this->GetConsO().size(); i++) {
 		pCurEdge = this->GetConO(i);
 		if(pCurEdge->GetAdaptationState() == true) {
 			val = Functor::learn( 	this->GetValue(), 

@@ -18,7 +18,7 @@ template <class Type>
 AbsNeuron<Type>::AbsNeuron() {
 	m_fValue = GetRandReal(-0.5f, 0.5f);
 	m_fErrorDelta = 0;
-	m_pParentLayer = NULL;
+	m_pParentLayer = nullptr;
 }
 
 template <class Type>
@@ -29,9 +29,9 @@ AbsNeuron<Type>::AbsNeuron(AbsLayer<Type> *parentLayer) : m_pParentLayer(parentL
 
 template <class Type>
 AbsNeuron<Type>::AbsNeuron(const AbsNeuron<Type> *pNeuron) {
-	Type fErrorDelta 	= pNeuron->GetErrorDelta();
-	Type fValue 		= pNeuron->GetValue();
-	int iID 		= pNeuron->GetID();
+	Type fErrorDelta = pNeuron->GetErrorDelta();
+	Type fValue = pNeuron->GetValue();
+	int iID = pNeuron->GetID();
 
 	this->SetErrorDelta(fErrorDelta);
 	this->SetValue(fValue);
@@ -65,17 +65,17 @@ void AbsNeuron<Type>::AddConI(Edge<Type> *Edge) {
 }
 
 template <class Type>
-void AbsNeuron<Type>::SetConO(Edge<Type> *Edge, const unsigned int iID) {
+void AbsNeuron<Type>::SetConO(Edge<Type> *Edge, const uint32_t iID) {
 	m_lOutgoingConnections[iID] = Edge;
 }
 
 template <class Type>
-void AbsNeuron<Type>::SetConI(Edge<Type> *Edge, const unsigned int iID) {
+void AbsNeuron<Type>::SetConI(Edge<Type> *Edge, const uint32_t iID) {
 	m_lIncomingConnections[iID] = Edge;
 }
 
 template <class Type>
-unsigned int AbsNeuron<Type>::GetID() const {
+uint32_t AbsNeuron<Type>::GetID() const {
 	return m_iNeuronID;
 }
 
@@ -95,12 +95,12 @@ std::vector<Edge<Type> *> AbsNeuron<Type>::GetConsO() const{
 }
 
 template <class Type>
-Edge<Type>* AbsNeuron<Type>::GetConI(const unsigned int &pos) const {
+Edge<Type>* AbsNeuron<Type>::GetConI(const uint32_t &pos) const {
 	return m_lIncomingConnections.at(pos);
 }
 
 template <class Type>
-Edge<Type>* AbsNeuron<Type>::GetConO(const unsigned int &pos) const {
+Edge<Type>* AbsNeuron<Type>::GetConO(const uint32_t &pos) const {
 	return m_lOutgoingConnections.at(pos);
 }
 
@@ -147,8 +147,8 @@ AbsNeuron<Type>::operator Type() const {
 
 template <class Type>
 void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
-	unsigned int iNmbDims = this->GetPosition().size();
-	unsigned int iNmbOfConnects = this->GetConsO().size();
+	uint32_t iNmbDims = this->GetPosition().size();
+	uint32_t iNmbOfConnects = this->GetConsO().size();
 	int iSrcNeurID = this->GetID();
 
 	Type fEdgeValue = 0.f;
@@ -161,7 +161,7 @@ void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
 	 * important for SOMs
 	 */
 	BZ2_bzWrite( &iBZ2Error, bz2out, &iNmbDims, sizeof(int) );
-	for(unsigned int k = 0; k < iNmbDims; k++) {
+	for(uint32_t k = 0; k < iNmbDims; k++) {
 		Type fPos = this->GetPosition().at(k);
 		BZ2_bzWrite( &iBZ2Error, bz2out, &fPos, sizeof(Type) );
 	}
@@ -169,7 +169,7 @@ void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
 	 * Save data of connections
 	 */
 	BZ2_bzWrite( &iBZ2Error, bz2out, &iNmbOfConnects, sizeof(int) );
-	for(unsigned int k = 0; k < iNmbOfConnects; k++) {
+	for(uint32_t k = 0; k < iNmbOfConnects; k++) {
 		Edge<Type> *pCurEdge = this->GetConO(k);
 		iDstLayerID = pCurEdge->GetDestination(this)->GetParent()->GetID();
 		iDstNeurID = pCurEdge->GetDestinationID(this);
@@ -182,8 +182,8 @@ void AbsNeuron<Type>::ExpToFS(BZFILE* bz2out, int iBZ2Error) {
 
 template <class Type>
 void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Table) {
-	unsigned int iNmbDims = 0;
-	unsigned int iNmbOfConnects = 0;
+	uint32_t iNmbDims = 0;
+	uint32_t iNmbOfConnects = 0;
 
 	std::vector<Type> vNeuronPos;
 
@@ -199,7 +199,7 @@ void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Ta
 	 */
 	BZ2_bzRead( &iBZ2Error, bz2in, &iNmbDims, sizeof(int) );
 	vNeuronPos.resize(iNmbDims);
-	for(unsigned int k = 0; k < iNmbDims; k++) {
+	for(uint32_t k = 0; k < iNmbDims; k++) {
 		BZ2_bzRead( &iBZ2Error, bz2in, &vNeuronPos[k], sizeof(Type) );
 	}
 	Table.Neurons.back().m_iNeurID 		= iSrcNeurID;
@@ -213,7 +213,7 @@ void AbsNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Ta
 	 * Save data of connections
 	 */
 	BZ2_bzRead( &iBZ2Error, bz2in, &iNmbOfConnects, sizeof(int) );
-	for(unsigned int k = 0; k < iNmbOfConnects; k++) {
+	for(uint32_t k = 0; k < iNmbOfConnects; k++) {
 		BZ2_bzRead( &iBZ2Error, bz2in, &iDstLayerID, sizeof(int) );
 		BZ2_bzRead( &iBZ2Error, bz2in, &iDstNeurID, sizeof(int) );
 		BZ2_bzRead( &iBZ2Error, bz2in, &fEdgeValue, sizeof(Type) );

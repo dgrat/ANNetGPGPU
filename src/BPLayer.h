@@ -63,7 +63,7 @@ public:
 	 *
 	 * @param fType Flag describing the type of the layer.
 	 */
-	BPLayer(const unsigned int &iNumber, LayerTypeFlag fType, int iZLayer = -1);
+	BPLayer(const uint32_t &iNumber, LayerTypeFlag fType, int iZLayer = -1);
 
 	/**
 	 * Sets the z-layer of the layer. The z-layer defines, when a layer gets processed by the network.
@@ -86,13 +86,13 @@ public:
 	 * @param iSize New number of neurons.
 	 * @param iShiftID Value which has to get added to the ID of each neuron.
 	 */
-	virtual void Resize(const unsigned int &iSize);
+	virtual void Resize(const uint32_t &iSize);
 
 	/**
 	 * Adds neurons to the layer
 	 * @param iSize stands for the number of neurons which get added to the layer.
 	 */
-	virtual void AddNeurons(const unsigned int &iSize);
+	virtual void AddNeurons(const uint32_t &iSize);
 
 	/**
 	 * Sets the type of the layer (input, hidden or output layer)

@@ -23,7 +23,7 @@
 #endif
 
 namespace ANN {
-template <class T> class HebbianConf;
+template <class T> struct HebbianConf;
 template <class T> class Edge;
 template <class T> class AbsLayer;
 

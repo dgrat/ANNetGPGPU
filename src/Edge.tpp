@@ -16,8 +16,6 @@
 
 template <class Type>
 Edge<Type>::Edge() {
-	Type fValue = 0.f;
-	Type fMomentum = 0.f;
 	m_bAllowAdaptation = true;
 }
 
@@ -73,11 +71,11 @@ AbsNeuron<Type> *Edge<Type>::GetDestination(AbsNeuron<Type> *source) const {
 	}
 	else if(m_pNeuronFirst != source && m_pNeuronSecond != source) {
 		std::cout<<"error: neuron does not belong to this chain"<<std::endl;
-		return NULL;
+		return nullptr;
 	}
 	else {
 		std::cout<<"error: edge contains two identical neurons"<<std::endl;
-		return NULL;
+		return nullptr;
 	}
 }
 

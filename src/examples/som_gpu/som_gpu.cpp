@@ -5,6 +5,8 @@
  *      Author: dgrat
  */
 
+#include <map>
+
 #include <ANNet>
 #include <ANGPGPU>
 #include <ANContainers>
@@ -36,7 +38,7 @@ int main(int argc, char *argv[]) {
 	ANNGPGPU::SOMNetGPU<float, ANN::functor_gaussian<float>> gpu;
 	gpu.CreateSOM(3, 1, w1,w1);
 	gpu.SetTrainingSet(input);
-	
+/*
         // Clear initial weights
         for(int x = 0; x < w1*w1; x++) {
             ANN::SOMNeuron<float> *pNeur = (ANN::SOMNeuron<float>*)((ANN::SOMLayer<float>*)gpu.GetOPLayer())->GetNeuron(x);
@@ -50,8 +52,8 @@ int main(int argc, char *argv[]) {
                 pNeur->GetConI(2)->SetValue(1); 
             }
         }
-	
-	gpu.Training(1);
+*/
+	gpu.Training(100);
 
 	SOMReader w(w1, w1, w2);
 	for(int x = 0; x < w1*w1; x++) {
@@ -63,6 +65,11 @@ int main(int argc, char *argv[]) {
 		w.SetField(QPoint(pNeur->GetPosition()[0], pNeur->GetPosition()[1]), vCol );
 	}
 	w.Save("ColorsByGPU.png");
+	
+	std::map<uint32_t, ANN::Centroid<float>> cents = gpu.GetCentroids();
+	for(auto centr : cents) {
+		std::cout << "ID: " <<  centr.second._unitID << ", distance: " << centr.second._distance << std::endl;
+	}
 
 	return 0;
 }

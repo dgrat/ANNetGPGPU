@@ -21,6 +21,8 @@ SET( ANCUDASourceFiles
   SOMNetGPU.cu
 )
 
+add_compile_options(-Wall)
+
 IF(OPENMP_FOUND)
   MESSAGE(STATUS "\t-OpenMP found. We will link the library against -lgomp")
 

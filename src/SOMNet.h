@@ -40,12 +40,12 @@
 #include "containers/Centroid.h"
 
 #include <vector>
+#include <map>
 #endif
 
 namespace ANN {
 
 template <class T> class SOMNeuron;
-template <class T> class Centroid;
 
 enum {
 	ANRandomMode 	= 1 << 0,	// type of layer
@@ -60,26 +60,25 @@ typedef uint32_t TrainingMode;
 template<class Type, class Functor>
 class SOMNet : public AbsNet<Type> {
 protected:
+	std::map<uint32_t, ANN::Centroid<Type>> _centroids;
+
 	Functor		m_DistFunction;
 	SOMNeuron<Type> *m_pBMNeuron;
 
-	unsigned int 	m_iCycle;	// current cycle step in learning progress
-	unsigned int 	m_iCycles;	// maximum of cycles
-	
-	// Conscience mechanism
-	Type 		m_fConscienceRate;
+	uint32_t 	m_iCycle;	// current cycle step in learning progress
+	uint32_t 	m_iCycles;	// maximum of cycles
 
 	/* first Ctor */
-	std::vector<unsigned int> m_vDimI; // dimensions of the input layer (Cartesian coordinates)
-	std::vector<unsigned int> m_vDimO; // dimensions of the output layer (Cartesian coordinates)
+	std::vector<uint32_t> m_vDimI; // dimensions of the input layer (Cartesian coordinates)
+	std::vector<uint32_t> m_vDimO; // dimensions of the output layer (Cartesian coordinates)
 
 	/* second Ctor */
-	unsigned int 	m_iWidthI;	// width of the input layer
-	unsigned int 	m_iHeightI;	// height of the input layer
-	unsigned int 	m_iWidthO;	// width of the output layer
-	unsigned int 	m_iHeightO; 	// height of the output layer
+	uint32_t 	m_iWidthI;	// width of the input layer
+	uint32_t 	m_iHeightI;	// height of the input layer
+	uint32_t 	m_iWidthO;	// width of the output layer
+	uint32_t 	m_iHeightO; 	// height of the output layer
 
-	void TrainHelper(unsigned int);
+	void TrainHelper(uint32_t);
 
 protected:
 	/**
@@ -126,7 +125,7 @@ public:
 	 * @param vDimI vector inheriting the dimensions of the input layer: vDim[X], vDim[Y], vDim[Z], vDim[DimN], ..
 	 * @param vDimO vector inheriting the dimensions of the output layer: vDim[X], vDim[Y], vDim[Z], vDim[DimN], ..
 	 */
-	SOMNet(const std::vector<unsigned int> &vDimI, const std::vector<unsigned int> &vDimO);
+	SOMNet(const std::vector<uint32_t> &vDimI, const std::vector<uint32_t> &vDimO);
 
 	/**
 	 * @brief Creates a double layered network.
@@ -135,8 +134,8 @@ public:
 	 * @param iWidthO Width of the output layer
 	 * @param iHeightO Height of the output layer
 	 */
-	SOMNet(	const unsigned int &iWidthI, const unsigned int &iHeightI,
-		const unsigned int &iWidthO, const unsigned int &iHeightO);
+	SOMNet(	const uint32_t &iWidthI, const uint32_t &iHeightI,
+		const uint32_t &iWidthO, const uint32_t &iHeightO);
 
 	/**
 	 * @brief Defines the starting activation distance. 
@@ -150,7 +149,7 @@ public:
 	 * @param iSize Number of neurons of the layer.
 	 * @param flType Flag describing the type of the net.
 	 */
-	virtual AbsLayer<Type> *AddLayer(const unsigned int &iSize, const LayerTypeFlag &flType);
+	virtual AbsLayer<Type> *AddLayer(const uint32_t &iSize, const LayerTypeFlag &flType);
 
 	/**
 	 * @brief Creates the network based on a connection table.
@@ -165,8 +164,8 @@ public:
 	 * @param vDimI vector inheriting the dimensions of the input layer: vDim[X], vDim[Y], vDim[Z], vDim[DimN], ..
 	 * @param vDimO vector inheriting the dimensions of the output layer: vDim[X], vDim[Y], vDim[Z], vDim[DimN], ..
 	 */
-	void CreateSOM(	const std::vector<unsigned int> &vDimI,
-			const std::vector<unsigned int> &vDimO);
+	void CreateSOM(	const std::vector<uint32_t> &vDimI,
+			const std::vector<uint32_t> &vDimO);
 
 	/**
 	 * @brief Creates a double layered network. Each layer with vDim[1] * vDim[2] * vDim[n+1] * .. neurons.
@@ -177,8 +176,8 @@ public:
 	 * @param f2dEdgeMat Matrix containing the values of the edges of the network.
 	 * @param f2dNeurPos Matrix containing the position coordinates of the network.
 	 */
-	void CreateSOM(	const std::vector<unsigned int> &vDimI,
-			const std::vector<unsigned int> &vDimO,
+	void CreateSOM(	const std::vector<uint32_t> &vDimI,
+			const std::vector<uint32_t> &vDimO,
 			const F2DArray<Type> &f2dEdgeMat,
 			const F2DArray<Type> &f2dNeurPos);
 
@@ -189,8 +188,8 @@ public:
 	 * @param iWidthO Width of the output layer
 	 * @param iHeightO Height of the output layer
 	 */
-	void CreateSOM(	const unsigned int &iWidthI, const unsigned int &iHeightI,
-			const unsigned int &iWidthO, const unsigned int &iHeightO);
+	void CreateSOM(	const uint32_t &iWidthI, const uint32_t &iHeightI,
+			const uint32_t &iWidthO, const uint32_t &iHeightO);
 
 	/**
 	 * @brief Trains the network with given input until iCycles is reached.
@@ -199,40 +198,31 @@ public:
 	 * Value: ANRandomMode is faster, because one random input pattern is presented and a new cycle starts.\n
 	 * Value: ANSerialMode means, that all input patterns are presented in order. Then a new cycle starts.
 	 */
-	void Training(const unsigned int &iCycles = 1000, const TrainingMode &eMode = ANN::ANRandomMode);
-
-	/**
-	 * @brief Clustering results of the network.
-	 * @return std::vector<Centroid> Iterates through the input list and calcs the euclidean distance based on the BMU.
-	 */
-	std::vector<Centroid<Type>> GetCentroidList();
-
+	void Training(const uint32_t &iCycles = 1000, const TrainingMode &eMode = ANN::ANRandomMode);
+	
 	/**
 	 * @brief The Cartesian position of a neuron in the network
 	 * @return std::vector<Type> Returns the position.
 	 */
-	std::vector<Type> GetPosition(const unsigned int iNeuronID);
+	std::vector<Type> GetPosition(const uint32_t iNeuronID);
 	
 	/**
 	 * @brief Sets learning rate scalar of the network.
 	 * @param fVal New value of the learning rate. Recommended: 0.005f - 1.0f
 	 */
-	void SetLearningRate 	(const Type &fVal);
-
+	void SetLearningRate (const Type &fVal);
+	
 	/**
-	 * @brief Sets the scalar for the conscience mechanism. If it is zero, then conscience is not applied.
-	 * A value of zero leads to the standard kohonen implementation.
-	 * Value must be: 0.f < fVal < 1.f
+	 * @brief Clustering results of the network.
+	 * @return std::vector<Centroid> Returns the BMUs estimated while the network was trained.
 	 */
-	void SetConscienceRate(const Type &fVal);
-
+	std::map<uint32_t, Centroid<Type>> GetCentroids();
+	
 	/**
-	 * @brief Returns the conscience scalar of the network. If it is zero, then conscience is not applied.
-	 * @return Returns the rate for the application of the conscience mechanism. 
-	 * A value of zero leads to the standard kohonen implementation. 
-	 * Value must be: 0.f < fVal < 1.f
+	 * @brief Clustering results of the network.
+	 * @return std::vector<Centroid> Iterates through the input list and calcs the euclidean distance based on the BMU.
 	 */
-	Type GetConscienceRate();
+	virtual std::vector<Centroid<Type>> FindAllCentroids();
 	
 #ifdef __SOMNet_ADDON
 	#include __SOMNet_ADDON

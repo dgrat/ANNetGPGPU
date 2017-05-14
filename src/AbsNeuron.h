@@ -22,6 +22,7 @@
 #include "math/Random.h"
 
 #include <iostream>
+#include <omp.h>
 #include <vector>
 #include <string>
 #include <bzlib.h>
@@ -88,21 +89,21 @@ public:
 	 */
 	virtual void AddConO(Edge<Type> *edge);
 
-	virtual void SetConO(Edge<Type> *edge, const unsigned int iID);
-	virtual void SetConI(Edge<Type> *edge, const unsigned int iID);
+	virtual void SetConO(Edge<Type> *edge, const uint32_t iID);
+	virtual void SetConI(Edge<Type> *edge, const uint32_t iID);
 
 	/**
 	 * @brief Returns a pointer to an incoming weight
 	 * @return Pointer to an incoming edge
 	 * @param iID Index of edge in m_lIncomingConnections
 	 */
-	virtual Edge<Type>* GetConI(const unsigned int &iID) const;
+	virtual Edge<Type>* GetConI(const uint32_t &iID) const;
 	/**
 	 * @brief Returns a pointer to an outgoing weight
 	 * @return Pointer to an outgoing edge
 	 * @param iID Index of edge in m_lOutgoingConnections
 	 */
-	virtual Edge<Type>* GetConO(const unsigned int &iID) const;
+	virtual Edge<Type>* GetConO(const uint32_t &iID) const;
 	/**
 	 * @brief Returns all incoming weights
 	 * @return Array of pointers of all incoming edges
@@ -122,7 +123,7 @@ public:
 	 * @brief Returns the index of this neuron.
 	 * @return Index of this neuron.
 	 */
-	virtual unsigned int GetID() const;
+	virtual uint32_t GetID() const;
 	/**
 	 * @brief Set the neuron to a certain value.
 	 * @param fValue New value of this neuron.

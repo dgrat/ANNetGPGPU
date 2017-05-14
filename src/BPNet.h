@@ -87,7 +87,7 @@ public:
 	 * @param iSize Number of neurons of the layer.
 	 * @param flType Flag describing the type of the net.
 	 */
-	virtual BPLayer<Type, Functor> *AddLayer(const unsigned int &iSize, const LayerTypeFlag &flType);
+	virtual BPLayer<Type, Functor> *AddLayer(const uint32_t &iSize, const LayerTypeFlag &flType);
 	
 	/**
 	 * Cycles the input from m_pTrainingData
@@ -96,7 +96,7 @@ public:
 	 * @param iCycles Maximum number of training cycles
 	 * @param fTolerance Maximum error value (working as a break condition for early break-off)
 	 */
-	virtual std::vector<Type> TrainFromData(const unsigned int &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress);
+	virtual std::vector<Type> TrainFromData(const uint32_t &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress);
 
 	/**
 	 * Propagates through all neurons of the net beginning from the input layer.
@@ -159,11 +159,11 @@ public:
 	 * however without the layer of edges between "iStartID" and "iStopID".
 	 * Also the first and last layers of the new sub-net will automatically get a new flag as input or output layer.
 	 *
-	 * @param iStartID
-	 * @param iStopID
+	 * @param const &iStartID
+	 * @param const &iStopID
 	 * @return Returns a pointer to the new sub-network.
 	 */
-	BPNet<Type, Functor> *GetSubNet(const unsigned int &iStartID, const unsigned int &iStopID);
+	BPNet<Type, Functor> *GetSubNet(const uint32_t &iStartID, const uint32_t &iStopID);
 
 	/**
 	 * Define the learning rate, the weight decay and the momentum term.

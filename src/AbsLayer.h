@@ -21,13 +21,14 @@
 #include "containers/ConTable.h"
 
 #include <iostream>
+#include <omp.h>
 #include <vector>
 #include <stdint.h>
 #include <bzlib.h>
 #endif
 
 namespace ANN {
-template<class T> class ConTable;
+template<class T> struct ConTable;
 template<class T> class AbsNeuron;
 template<class T> class Edge;
 
@@ -86,14 +87,14 @@ public:
 	 * @param iSize New number of neurons.
 	 * @param iShiftID When called each neuron created gets an ID defined in this function plus the value of iShiftID. Used for example in ANHFLayer, when creating 2d matrix.
 	 */
-	virtual void Resize(const unsigned int &iSize) = 0;
+	virtual void Resize(const uint32_t &iSize) = 0;
 
 	/**
 	 * @brief Pointer to the neuron at index iID.
 	 * @return Returns the pointer of the neuron at index iID
 	 * @param iID Index of the neuron in m_lNeurons
 	 */
-	virtual AbsNeuron<Type> *GetNeuron(const unsigned int &iID) const;
+	virtual AbsNeuron<Type> *GetNeuron(const uint32_t &iID) const;
 	/**
 	 * @brief List of all neurons in this layer.
 	 * @return Returns an array with pointers of neurons in this layer.
@@ -104,7 +105,7 @@ public:
 	 * @brief Adds neurons to the layer
 	 * @param iSize Number of neurons to add.
 	 */
-	virtual void AddNeurons(const unsigned int &iSize) = 0;
+	virtual void AddNeurons(const uint32_t &iSize) = 0;
 
 	/**
 	 * @brief Sets the type of the layer (input, hidden or output layer)

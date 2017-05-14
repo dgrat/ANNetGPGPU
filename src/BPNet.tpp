@@ -27,12 +27,12 @@ BPNet<Type, Functor>::BPNet() {
 template <class Type, class Functor>
 BPNet<Type, Functor>::BPNet(BPNet<Type, Functor> *pNet) //: AbsNet(pNet)
 {
-	assert( pNet != NULL );
+	assert( pNet != nullptr );
 	*this = *pNet;
 }
 
 template <class Type, class Functor>
-BPLayer<Type, Functor> *BPNet<Type, Functor>::AddLayer(const unsigned int &iSize, const LayerTypeFlag &flType) {
+BPLayer<Type, Functor> *BPNet<Type, Functor>::AddLayer(const uint32_t &iSize, const LayerTypeFlag &flType) {
 	BPLayer<Type, Functor> *pRet = new BPLayer<Type, Functor>(iSize, flType, -1);
 	this->AddLayer(pRet);
 	return pRet;
@@ -41,19 +41,6 @@ BPLayer<Type, Functor> *BPNet<Type, Functor>::AddLayer(const unsigned int &iSize
 template <class Type, class Functor>
 void BPNet<Type, Functor>::CreateNet(const ConTable<Type> &Net) {
 	ANN::printf("Create BPNet\n");
-	/*
-	 * Init
-	 */
-	unsigned int iDstNeurID = 0;
-	unsigned int iDstLayerID = 0;
-	unsigned int iSrcLayerID = 0;
-
-	Type fEdgeValue = 0.f;
-
-	AbsLayer<Type> *pDstLayer = NULL;
-	AbsLayer<Type> *pSrcLayer = NULL;
-	AbsNeuron<Type> *pDstNeur = NULL;
-	AbsNeuron<Type> *pSrcNeur = NULL;
 
 	/*
 	 * For all nets necessary: Create Connections (Edges)
@@ -63,7 +50,7 @@ void BPNet<Type, Functor>::CreateNet(const ConTable<Type> &Net) {
 	/*
 	 * Support z-layers
 	 */
-	for(unsigned int i = 0; i < this->m_lLayers.size(); i++) {
+	for(uint32_t i = 0; i < this->m_lLayers.size(); i++) {
 		BPLayer<Type, Functor> *curLayer = ((BPLayer<Type, Functor>*)this->GetLayer(i) );
 		curLayer->SetZLayer(Net.ZValOfLayer[i]);
 	}
@@ -75,11 +62,11 @@ void BPNet<Type, Functor>::AddLayer(BPLayer<Type, Functor> *pLayer) {
 
 	if( ( (BPLayer<Type, Functor>*)pLayer)->GetFlag() & ANLayerInput ) {
 		this->m_pIPLayer = pLayer;
+		return;
 	}
-	else if( ( (BPLayer<Type, Functor>*)pLayer)->GetFlag() & ANLayerOutput ) {
+	if( ( (BPLayer<Type, Functor>*)pLayer)->GetFlag() & ANLayerOutput ) {
 		this->m_pOPLayer = pLayer;
-	}
-	else {
+		return;
 	}
 }
 
@@ -87,7 +74,7 @@ void BPNet<Type, Functor>::AddLayer(BPLayer<Type, Functor> *pLayer) {
  * TODO better use of copy constructors
  */
 template <class Type, class Functor>
-BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const unsigned int &iStartID, const unsigned int &iStopID) {
+BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const uint32_t &iStartID, const uint32_t &iStopID) {
 	assert( iStopID < this->GetLayers().size() );
 	assert( iStartID >= 0 );
 
@@ -99,7 +86,7 @@ BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const unsigned int &iStart
 	/*
 	 * Create layers like in pNet
 	 */
-	for(unsigned int i = iStartID; i <= iStopID; i++) {
+	for(uint32_t i = iStartID; i <= iStopID; i++) {
 		BPLayer<Type, Functor> *pLayer = new BPLayer<Type, Functor>((BPLayer<Type, Functor>*)this->GetLayer(i), -1);
 		
 		if( i == iStartID && !(( (BPLayer<Type, Functor>*)this->GetLayer(i) )->GetFlag() & ANLayerInput) )
@@ -113,18 +100,17 @@ BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const unsigned int &iStart
 	BPLayer<Type, Functor> *pCurLayer;
 	AbsNeuron<Type> *pCurNeuron;
 	Edge<Type> *pCurEdge;
-	for(unsigned int i = iStartID; i <= iStopID; i++) { 	// layers ..
-		// NORMAL NEURON
+	for(uint32_t i = iStartID; i <= iStopID; i++) { 	// layers ..
 		pCurLayer = ( (BPLayer<Type, Functor>*)this->GetLayer(i) );
-		for(unsigned int j = 0; j < pCurLayer->GetNeurons().size(); j++) { 		// neurons ..
+		for(uint32_t j = 0; j < pCurLayer->GetNeurons().size(); j++) { // neurons ..
 			pCurNeuron = pCurLayer->GetNeurons().at(j);
 			AbsNeuron<Type> *pSrcNeuron = ( (BPLayer<Type, Functor>*)pNet->GetLayer(i) )->GetNeuron(j);
-			for(unsigned int k = 0; k < pCurNeuron->GetConsO().size(); k++) { 			// edges ..
+			for(uint32_t k = 0; k < pCurNeuron->GetConsO().size(); k++) { // edges ..
 				pCurEdge = pCurNeuron->GetConO(k);
 
 				// get iID of the destination neuron of the (next) layer i+1 (j is iID of (the current) layer i)
-				int iDestNeurID 	= pCurEdge->GetDestinationID(pCurNeuron);
-				int iDestLayerID 	= pCurEdge->GetDestination(pCurNeuron)->GetParent()->GetID();
+				int iDestNeurID = pCurEdge->GetDestinationID(pCurNeuron);
+				int iDestLayerID = pCurEdge->GetDestination(pCurNeuron)->GetParent()->GetID();
 
 				// copy edge
 				AbsNeuron<Type> *pDstNeuron = pNet->GetLayers().at(iDestLayerID)->GetNeuron(iDestNeurID);
@@ -147,7 +133,7 @@ BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const unsigned int &iStart
 
 template <class Type, class Functor>
 void BPNet<Type, Functor>::PropagateFW() {
-	for(unsigned int i = 1; i < this->m_lLayers.size(); i++) {
+	for(uint32_t i = 1; i < this->m_lLayers.size(); i++) {
 		BPLayer<Type, Functor> *curLayer = ((BPLayer<Type, Functor>*)this->GetLayer(i) );
 		//#pragma omp parallel for
 		for(int j = 0; j < static_cast<int>(curLayer->GetNeurons().size() ); j++) {
@@ -168,7 +154,7 @@ void BPNet<Type, Functor>::PropagateBW() {
 }
 
 template <class Type, class Functor>
-std::vector<Type> BPNet<Type, Functor>::TrainFromData(const unsigned int &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress) {
+std::vector<Type> BPNet<Type, Functor>::TrainFromData(const uint32_t &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress) {
 	bool bZSort = false;
 	for(int i = 0; i < this->m_lLayers.size(); i++) {
 		if(((BPLayer<Type, Functor>*)this->m_lLayers[i])->GetZLayer() > -1)

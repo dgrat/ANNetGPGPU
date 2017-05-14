@@ -26,8 +26,8 @@ BPLayer<Type, Functor>::BPLayer(int iZLayer) {
 
 template <class Type, class Functor>
 BPLayer<Type, Functor>::BPLayer(const BPLayer *pLayer, int iZLayer) {
-	int iNumber 		= pLayer->GetNeurons().size();
-	LayerTypeFlag fType 	= pLayer->GetFlag();
+	int iNumber = pLayer->GetNeurons().size();
+	LayerTypeFlag fType = pLayer->GetFlag();
 
 	m_iZLayer = iZLayer;
 
@@ -36,7 +36,7 @@ BPLayer<Type, Functor>::BPLayer(const BPLayer *pLayer, int iZLayer) {
 }
 
 template <class Type, class Functor>
-BPLayer<Type, Functor>::BPLayer(const unsigned int &iNumber, LayerTypeFlag fType, int iZLayer) {
+BPLayer<Type, Functor>::BPLayer(const uint32_t &iNumber, LayerTypeFlag fType, int iZLayer) {
 	this->Resize(iNumber);
 	this->SetFlag(fType);
 
@@ -54,14 +54,14 @@ int BPLayer<Type, Functor>::GetZLayer() {
 }
 
 template <class Type, class Functor>
-void BPLayer<Type, Functor>::Resize(const unsigned int &iSize) {
+void BPLayer<Type, Functor>::Resize(const uint32_t &iSize) {
 	this->EraseAll();
 	this->AddNeurons(iSize);
 }
 
 template <class Type, class Functor>
-void BPLayer<Type, Functor>::AddNeurons(const unsigned int &iSize) {
-	for(unsigned int i = 0; i < iSize; i++) {
+void BPLayer<Type, Functor>::AddNeurons(const uint32_t &iSize) {
+	for(uint32_t i = 0; i < iSize; i++) {
 		AbsNeuron<Type> *pNeuron = new BPNeuron<Type, Functor>(this);
 		this->m_lNeurons.push_back(pNeuron);
 		pNeuron->SetID(this->m_lNeurons.size()-1);
@@ -72,7 +72,7 @@ template <class Type, class Functor>
 void BPLayer<Type, Functor>::ConnectLayer(AbsLayer<Type> *pDestLayer, const bool &bAllowAdapt) {
 	AbsNeuron<Type> *pSrcNeuron;
 
-	for(unsigned int i = 0; i < this->m_lNeurons.size(); i++) {
+	for(uint32_t i = 0; i < this->m_lNeurons.size(); i++) {
 		pSrcNeuron = this->m_lNeurons[i];
 		ANN::Connect(pSrcNeuron, pDestLayer, bAllowAdapt);
 	}
@@ -87,12 +87,12 @@ void BPLayer<Type, Functor>::ConnectLayer(
 	AbsNeuron<Type> *pSrcNeuron;
 
 	assert( Connections.size() != this->m_lNeurons.size() );
-	for(unsigned int i = 0; i < Connections.size(); i++) {
+	for(uint32_t i = 0; i < Connections.size(); i++) {
 		std::vector<int> subArray = Connections.at(i);
 		pSrcNeuron = this->GetNeuron(i);
 		assert(i != pSrcNeuron->GetID() );
 
-		for(unsigned int j = 0; j < subArray.size(); j++) {
+		for(uint32_t j = 0; j < subArray.size(); j++) {
 			assert( j < pDestLayer->GetNeurons().size() );
 			AbsNeuron<Type> *pDestNeuron = pDestLayer->GetNeuron(j);
 			assert( j < pDestNeuron->GetID() );
@@ -122,15 +122,15 @@ void BPLayer<Type, Functor>::Setup(const HebbianConf<Type> &config) {
 
 template <class Type, class Functor>
 void BPLayer<Type, Functor>::ImpMomentumsEdgesIn(const F2DArray<Type> &mat) {
-	unsigned int iHeight 	= this->m_lNeurons.at(0)->GetConsI().size();
-	unsigned int iWidth 	= this->m_lNeurons.size();
+	uint32_t iHeight 	= this->m_lNeurons.at(0)->GetConsI().size();
+	uint32_t iWidth 	= this->m_lNeurons.size();
 
 	assert(iHeight == mat.GetH() );
 	assert(iWidth == mat.GetW() );
 
 	#pragma omp parallel for
 	for(int y = 0; y < static_cast<int>(iHeight); y++) {
-		for(unsigned int x = 0; x < iWidth; x++) {
+		for(uint32_t x = 0; x < iWidth; x++) {
 			this->m_lNeurons.at(x)->GetConI(y)->SetMomentum(mat[y][x]);
 		}
 	}
@@ -138,15 +138,15 @@ void BPLayer<Type, Functor>::ImpMomentumsEdgesIn(const F2DArray<Type> &mat) {
 
 template <class Type, class Functor>
 void BPLayer<Type, Functor>::ImpMomentumsEdgesOut(const F2DArray<Type> &mat) {
-	unsigned int iHeight 	= this->m_lNeurons.at(0)->GetConsO().size();
-	unsigned int iWidth 	= this->m_lNeurons.size();
+	uint32_t iHeight 	= this->m_lNeurons.at(0)->GetConsO().size();
+	uint32_t iWidth 	= this->m_lNeurons.size();
 
 	assert(iHeight == mat.GetH() );
 	assert(iWidth == mat.GetW() );
 
 	#pragma omp parallel for
 	for(int y = 0; y < static_cast<int>(iHeight); y++) {
-		for(unsigned int x = 0; x < iWidth; x++) {
+		for(uint32_t x = 0; x < iWidth; x++) {
 			this->m_lNeurons.at(x)->GetConO(y)->SetMomentum(mat[y][x]);
 		}
 	}
