@@ -14,11 +14,6 @@
    Author: Daniel Frenzel (dgdanielf@gmail.com)
 */
 
-template <class Type>
-TrainingSet<Type>::TrainingSet() {
-	m_vInputList.resize(0);
-	m_vOutputList.resize(0);
-}
 
 template <class Type>
 TrainingSet<Type>::~TrainingSet() {
@@ -49,6 +44,11 @@ void TrainingSet<Type>::AddOutput(Type *pOut, const unsigned int &iSize) {
 	for(unsigned int i = 0; i < iSize; i++)
 		vOut.push_back(pOut[i]);
 	AddOutput(vOut);
+}
+
+template <class Type>
+bool TrainingSet<Type>::Empty() const {
+	return GetNrElements() == 0 ? true : false;
 }
 
 template <class Type>

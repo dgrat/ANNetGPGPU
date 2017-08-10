@@ -252,9 +252,9 @@ void MainWindow::sl_saveANNet() {
 	m_bAlreadyTrained = false;
 
  	// Save current training set
-	m_pTrainingSet 			= m_pInputDial->getTrainingSet();
+	m_pTrainingSet = m_pInputDial->getTrainingSet();
 	if(m_pTrainingSet) {
-		m_pANNet->SetTrainingSet(m_pTrainingSet);
+		m_pANNet->SetTrainingSet(*m_pTrainingSet);
 	}
 
 	if(m_pANNet) {
@@ -296,7 +296,7 @@ void MainWindow::sl_loadANNet() {
 
 		m_pOutputTable->reset();
 
-		m_pTrainingSet = m_pANNet->GetTrainingSet();
+		m_pTrainingSet = &m_pANNet->GetTrainingSet();
 		if(m_pTrainingSet) {
 			m_pRunInput->setDisabled(false);
 			m_pStartStopTraining->setDisabled(false);
@@ -434,7 +434,7 @@ void MainWindow::sl_run() {
  	// Save current training set
 	m_pTrainingSet 			= m_pInputDial->getTrainingSet();
 	if(m_pANNet && m_pTrainingSet) {
-		m_pANNet->SetTrainingSet(m_pTrainingSet);
+		m_pANNet->SetTrainingSet(*m_pTrainingSet);
 		m_pOutputTable->display(m_pANNet);
 
 		m_pTabBar->setTabEnabled(4, true); 	// m_pOutputTable
@@ -540,10 +540,10 @@ void MainWindow::sl_startTraining() {
  	std::string sTFunct 	= m_pTrainingDial->getTransfFunct().data();
 
  	// Save current training set
-	m_pTrainingSet 			= m_pInputDial->getTrainingSet();
+	m_pTrainingSet = m_pInputDial->getTrainingSet();
 	// Get current net
 	if(m_pANNet == NULL) {
-		m_pANNet 			= m_pViewer->getScene()->getANNet();
+		m_pANNet = m_pViewer->getScene()->getANNet();
 	}
  	// Reload the IO widget
 	m_pInputDial->setTrainingSet(m_pTrainingSet);
@@ -564,7 +564,7 @@ void MainWindow::sl_startTraining() {
 		ANN::HebbianConf<float> conf = {fLearningRate, fMomentum, fWeightDecay};
 		m_pANNet->Setup(conf);
 		
-		m_pANNet->SetTrainingSet(m_pTrainingSet);
+		m_pANNet->SetTrainingSet(*m_pTrainingSet);
 
 		m_pTrainingThread->setNet(m_pANNet, iCycles, fMaxError, m_bBreakTraining);
 		m_pTrainingThread->start();

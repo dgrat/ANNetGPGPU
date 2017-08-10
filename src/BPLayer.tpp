@@ -70,26 +70,19 @@ void BPLayer<Type, Functor>::AddNeurons(const unsigned int &iSize) {
 
 template <class Type, class Functor>
 void BPLayer<Type, Functor>::ConnectLayer(AbsLayer<Type> *pDestLayer, const bool &bAllowAdapt) {
-	AbsNeuron<Type> *pSrcNeuron;
-
 	for(unsigned int i = 0; i < this->m_lNeurons.size(); i++) {
-		pSrcNeuron = this->m_lNeurons[i];
+		AbsNeuron<Type> *pSrcNeuron = this->m_lNeurons[i];
 		ANN::Connect(pSrcNeuron, pDestLayer, bAllowAdapt);
 	}
 }
 
 template <class Type, class Functor>
-void BPLayer<Type, Functor>::ConnectLayer(
-		AbsLayer<Type> *pDestLayer,
-		std::vector<std::vector<int> > Connections,
-		const bool bAllowAdapt)
+void BPLayer<Type, Functor>::ConnectLayer(AbsLayer<Type> *pDestLayer, std::vector<std::vector<int> > Connections, const bool bAllowAdapt)
 {
-	AbsNeuron<Type> *pSrcNeuron;
-
 	assert( Connections.size() != this->m_lNeurons.size() );
 	for(unsigned int i = 0; i < Connections.size(); i++) {
 		std::vector<int> subArray = Connections.at(i);
-		pSrcNeuron = this->GetNeuron(i);
+		AbsNeuron<Type> *pSrcNeuron = this->GetNeuron(i);
 		assert(i != pSrcNeuron->GetID() );
 
 		for(unsigned int j = 0; j < subArray.size(); j++) {

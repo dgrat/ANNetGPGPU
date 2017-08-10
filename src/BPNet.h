@@ -99,61 +99,6 @@ public:
 	virtual std::vector<Type> TrainFromData(const unsigned int &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress);
 
 	/**
-	 * Propagates through all neurons of the net beginning from the input layer.
-	 * Updates all neuron values of the network.
-	 *
-	 * The neuron output is defined as:
-	 * \f$
-	 * o_{j}=\varphi(\mbox{net}_{j})
-	 * \f$
-	 * , whereas the neuron input is defined as:
-	 * \f$
-	 * \mbox{net}_{j}=\sum\limits_{i=1}^{n} x_{i} w_{ij}.
-	 * \f$
-	 * \n
-	 * \f$
-	 * \\	\varphi\ \text{ is a differentiable activation function,}
-	 * \\	n \text{ is the number of inputs,}
-	 * \\	x_{i} \text{ is the input } i \text{ and}
-	 * \\	w_{ij} \text{ is the weight between neuron } i \text{ and neuron } j
-	 * \f$.
-	 */
-	virtual void PropagateFW();
-	/**
-	 * Propagates through all neurons of the net beginning from the output layer. \n
-	 * Calculates error deltas of neurons from current learning output and training output data. \n
-	 * Also updates all weights of the net beginning from the output layer. \n
-	 * The backpropagation works as described below: \n \n
-	 * \f$
-	 * \\	\mbox{1. Is the neuron in the output layer, it takes part of the output,}
-	 * \\	\mbox{2. is the neuron in the hidden layer, the weight adaption could get calculated.}
-	 * \\	\mbox{	concrete:}
-	 *
-	 * \\	\Delta w_{ij}(t+1)= \eta \delta_{j} x_{i} + \alpha \Delta w_{ij}(t)
-	 *
-	 * \\	\mbox{	with}
-	 *
-	 * \\	\delta_{j}=\begin{cases}
-	 * 	\varphi'(\mbox{net}_{j})(t_{j}-o_{j}) & \mbox{if } j \mbox{ is an output neuron,}\\
-	 * 	\varphi'(\mbox{net}_{j}) \sum_{k} \delta_{k} w_{jk} & \mbox{if } j \mbox{ is an hidden neuron.}
-	 * 	\end{cases}
-	 *
-	 * \\ 	\mbox{	and}
-	 *
-	 * \\	\Delta w_{ij} \mbox{ is the change of the weight } w_{ij} \mbox{ of the connection }i\mbox{ to neuron }j\mbox{,}
-	 * \\	\eta \mbox{ is the learning rate, which regulates to amount of the weight change,}
-	 * \\	\delta_{j} \mbox{ is the error signal of the neuron } j mbox{,}
-	 * \\	x_{i} \mbox{ is the output of the neuron } i \mbox{,}
-	 * \\	t_{j} \mbox{ is the debit output of the output neuron } j \mbox{,}
-	 * \\	o_{j} \mbox{ is the actual output of the output neuron } j \mbox{ und}
-	 * \\	k \mbox{ is the index of the subsequent neurons of } j \mbox{.}
-	 * \\ 	\Delta w_{ij}(t+1) \mbox{ is the change of the weight } w_{ij}(t+1) \mbox{ of the connection of neuron } i \mbox{ to neuron } j \mbox{ at the time point (t+1),}
-	 * \\ 	\alpha \mbox{ is the influence of the momentum term } \Delta w_{ij}(t) \mbox{. Correlates with the weight change of the prior time point.}
-	 * \f$
-	 */
-	virtual void PropagateBW();
-
-	/**
 	 * Will create a sub-network from layer "iStartID" to layer "iStopID".
 	 * This network will have all the properties of the network it is derivated from,
 	 * however without the layer of edges between "iStartID" and "iStopID".

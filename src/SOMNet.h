@@ -98,11 +98,6 @@ protected:
 	void PropagateBW();
 
 	/**
-	 * @brief Propagates through the network forwardly.
-	 */
-	void PropagateFW();
-
-	/**
 	 * @brief Adds a new layer to the network. New layer will get appended to m_lLayers.
 	 * @param pLayer Pointer to the new layer.
 	 */

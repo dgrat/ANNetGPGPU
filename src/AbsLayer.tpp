@@ -334,8 +334,6 @@ void AbsLayer<Type>::ImpPositions(const F2DArray<Type> &f2dPos) {
 template <class Type>
 void AbsLayer<Type>::ImpPositions(const F2DArray<Type> &f2dPos, int iStart, int iStop) {
 	unsigned int iHeight = f2dPos.GetH();
-	unsigned int iWidth = f2dPos.GetW();
-
 	assert(iStop-iStart <= m_lNeurons.size() );
 	
 	int iC = 0;

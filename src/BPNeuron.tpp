@@ -43,18 +43,13 @@ void BPNeuron<Type, Functor>::CalcValue() {
 
 template <class Type, class Functor>
 void BPNeuron<Type, Functor>::AdaptEdges() {
-	if(this->GetConsO().size() == 0)
-		return;
-
-	AbsNeuron<Type> *pCurNeuron;
-	Edge<Type> 	*pCurEdge;
-	Type 		val;
+	if(this->GetConsO().size() == 0) return;
 
 	// calc error deltas
-	val = this->GetErrorDelta();
+	Type val = this->GetErrorDelta();
 	for(unsigned int i = 0; i < this->GetConsO().size(); i++) {
-		pCurEdge 	= this->GetConO(i);
-		pCurNeuron 	= pCurEdge->GetDestination(this);
+		Edge<Type> *pCurEdge = this->GetConO(i);
+		AbsNeuron<Type> *pCurNeuron = pCurEdge->GetDestination(this);
 		val += pCurNeuron->GetErrorDelta() * pCurEdge->GetValue();
 	}
 	
@@ -63,7 +58,7 @@ void BPNeuron<Type, Functor>::AdaptEdges() {
 
 	// adapt weights
 	for(unsigned int i = 0; i < this->GetConsO().size(); i++) {
-		pCurEdge = this->GetConO(i);
+		Edge<Type> *pCurEdge = this->GetConO(i);
 		if(pCurEdge->GetAdaptationState() == true) {
 			val = Functor::learn( 	this->GetValue(), 
 						pCurEdge->GetValue(), 

@@ -150,12 +150,12 @@ public:
 	 * @brief Overload to define how the net has to act while propagating back.
 	 * I.e. how to modify the edges after calculating the error deltas.
 	 */
-	virtual void AdaptEdges() 	= 0;
+	virtual void AdaptEdges() = 0;
 	/**
 	 * @brief Overload to define how the net has to act while propagating.
 	 * I.e. which neurons/edges to use for calculating the new value of the neuron
 	 */
-	virtual void CalcValue() 	= 0;
+	virtual void CalcValue() = 0;
 
 	/**
 	 * @brief Save neuron's content to filesystem

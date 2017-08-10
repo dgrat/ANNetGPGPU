@@ -43,7 +43,7 @@ void Output::display(ANN::BPNet<float, ANN::fcn_log<float>> *pNet) {
 	font.setBold(true);
 	QTableWidgetItem *pItem;
 
-	m_pTableWidget->setColumnCount(pNet->GetTrainingSet()->GetNrElements()*2);
+	m_pTableWidget->setColumnCount(pNet->GetTrainingSet().GetNrElements()*2);
 	m_pTableWidget->setRowCount(pNet->GetOPLayer()->GetNeurons().size() );
 	for(unsigned int i = 0; i < pNet->GetOPLayer()->GetNeurons().size(); i++) {
 		pItem = new QTableWidgetItem("Neuron "+QString::number(i+1));
@@ -51,7 +51,7 @@ void Output::display(ANN::BPNet<float, ANN::fcn_log<float>> *pNet) {
 		m_pTableWidget->setVerticalHeaderItem(i, pItem);
 	}
 
-	for(unsigned int i = 0; i < pNet->GetTrainingSet()->GetNrElements(); i++) {
+	for(unsigned int i = 0; i < pNet->GetTrainingSet().GetNrElements(); i++) {
 		pItem = new QTableWidgetItem("Wished\nfrom set: "+QString::number(i+1));
 		pItem->setFont(font);
 		m_pTableWidget->setHorizontalHeaderItem(2*i, pItem);
@@ -60,10 +60,10 @@ void Output::display(ANN::BPNet<float, ANN::fcn_log<float>> *pNet) {
 		pItem->setFont(font);
 		m_pTableWidget->setHorizontalHeaderItem(2*i+1, pItem);
 
-		pNet->SetInput(pNet->GetTrainingSet()->GetInput(i) );
+		pNet->SetInput(pNet->GetTrainingSet().GetInput(i) );
 		pNet->PropagateFW();
 
-		std::vector<float> vOut = pNet->GetTrainingSet()->GetOutput(i);
+		std::vector<float> vOut = pNet->GetTrainingSet().GetOutput(i);
 		for(unsigned int j = 0; j < vOut.size(); j++) {
 			m_pTableWidget->setItem(j, 2*i, new QTableWidgetItem(QString::number(vOut.at(j))) );
 		}

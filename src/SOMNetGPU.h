@@ -44,7 +44,7 @@ private:
 	 * Returns the number of cuda capable devices as integer.
 	 * @return Number of cuda capable devices
 	 */
-	int32_t GetCudaDeviceCount() const;
+	size_t GetCudaDeviceCount() const;
 	ANN::Centroid<Type> hostSOMFindBMNeuronID(std::vector<SOMExport<Type>> &SExp, const thrust::device_vector<Type> &dvInput);
 	void hostSOMPropagateBW( std::vector<SOMExport<Type>> &SExp, const int32_t &iPatternID);
 

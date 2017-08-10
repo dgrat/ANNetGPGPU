@@ -16,13 +16,6 @@
 
 template <class Type>
 SOMNeuron<Type>::SOMNeuron(SOMLayer<Type> *parent) : AbsNeuron<Type>(parent) {
-	m_fLearningRate = 0.5f;
-
-	// gives neuron random coordinates
-	for(uint32_t i = 0; i < this->m_vPosition.size(); i++) {
-		int iMax = parent->GetDim(i) * 10;
-		this->m_vPosition[i] = GetRandReal<Type>(0, iMax);
-	}
 }
 
 template <class Type>
@@ -39,8 +32,8 @@ void SOMNeuron<Type>::ImpFromFS(BZFILE* bz2in, int iBZ2Error, ConTable<Type> &Ta
 	ANN::printf("Load SOMNeuron from FS\n");
 	AbsNeuron<Type>::ImpFromFS(bz2in, iBZ2Error, Table);
 
-	Type 	fLearningRate; // learning rate
-	Type	fSigma0; // inital distance bias to get activated
+	Type fLearningRate; // learning rate
+	Type fSigma0; // inital distance bias to get activated
 	
 	BZ2_bzRead( &iBZ2Error, bz2in, &fLearningRate, sizeof(Type) );
 	BZ2_bzRead( &iBZ2Error, bz2in, &fSigma0, sizeof(Type) );

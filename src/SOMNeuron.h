@@ -37,10 +37,10 @@ template <class T> class SOMLayer;
 template <class Type>
 class SOMNeuron : public AbsNeuron<Type> {
 protected:
-	Type 	m_fLearningRate; 	// learning rate
-	Type 	m_fInfluence; 		// distance of neurons in neighborhood to alterate
-	Type	m_fSigma0;		// inital distance bias to get activated
-	Type	m_fSigmaT;		// current epoch dependent distance bias
+	Type m_fLearningRate = static_cast<Type>(0.5f); // learning rate
+	Type m_fInfluence = static_cast<Type>(0); // distance of neurons in neighborhood to alterate
+	Type m_fSigma0 = static_cast<Type>(0); // inital distance bias to get activated
+	Type m_fSigmaT = static_cast<Type>(0); // current epoch dependent distance bias
 
 public:
 	SOMNeuron(SOMLayer<Type> *parent = nullptr);

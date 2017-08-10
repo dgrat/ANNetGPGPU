@@ -42,20 +42,6 @@ template <class Type, class Functor>
 void BPNet<Type, Functor>::CreateNet(const ConTable<Type> &Net) {
 	ANN::printf("Create BPNet\n");
 	/*
-	 * Init
-	 */
-	unsigned int iDstNeurID = 0;
-	unsigned int iDstLayerID = 0;
-	unsigned int iSrcLayerID = 0;
-
-	Type fEdgeValue = 0.f;
-
-	AbsLayer<Type> *pDstLayer = NULL;
-	AbsLayer<Type> *pSrcLayer = NULL;
-	AbsNeuron<Type> *pDstNeur = NULL;
-	AbsNeuron<Type> *pSrcNeur = NULL;
-
-	/*
 	 * For all nets necessary: Create Connections (Edges)
 	 */
 	AbsNet<Type>::CreateNet(Net);
@@ -144,7 +130,7 @@ BPNet<Type, Functor> *BPNet<Type, Functor>::GetSubNet(const unsigned int &iStart
 
 	return pNet;
 }
-
+/*
 template <class Type, class Functor>
 void BPNet<Type, Functor>::PropagateFW() {
 	for(unsigned int i = 1; i < this->m_lLayers.size(); i++) {
@@ -159,14 +145,14 @@ void BPNet<Type, Functor>::PropagateFW() {
 template <class Type, class Functor>
 void BPNet<Type, Functor>::PropagateBW() {
 	for(int i = this->m_lLayers.size()-1; i >= 0; i--) {
-		BPLayer<Type, Functor> *curLayer = ( (BPLayer<Type, Functor>*)this->GetLayer(i) );
+		BPLayer<Type, Functor> *curLayer = ((BPLayer<Type, Functor>*)this->GetLayer(i) );
 		//#pragma omp parallel for
 		for(int j = 0; j < static_cast<int>( curLayer->GetNeurons().size() ); j++) {
 			curLayer->GetNeuron(j)->AdaptEdges();
 		}
 	}
 }
-
+*/
 template <class Type, class Functor>
 std::vector<Type> BPNet<Type, Functor>::TrainFromData(const unsigned int &iCycles, const Type &fTolerance, const bool &bBreak, Type &fProgress) {
 	bool bZSort = false;

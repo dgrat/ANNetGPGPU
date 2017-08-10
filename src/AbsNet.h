@@ -57,12 +57,12 @@ template <class Type>
 class AbsNet {	
 protected:
 	NetTypeFlag m_fTypeFlag = ANNetUndefined;
-	TrainingSet<Type> *m_pTrainingData = nullptr;			// list of training data
+	TrainingSet<Type> m_pTrainingData;	// list of training data
 
 	// TODO maybe USE MAP for index administration?!
-	std::vector<AbsLayer<Type>*> m_lLayers;			// list of all layers, layer->GetID() must be identical with indices of this array!
-	AbsLayer<Type> *m_pIPLayer = nullptr;				// pointer to input layer
-	AbsLayer<Type> *m_pOPLayer = nullptr;				// pointer to output layer
+	std::vector<AbsLayer<Type>*> m_lLayers;	// list of all layers, layer->GetID() must be identical with indices of this array!
+	AbsLayer<Type> *m_pIPLayer = nullptr;	// pointer to input layer
+	AbsLayer<Type> *m_pOPLayer = nullptr;	// pointer to output layer
 
 	/**
 	 * @brief Adds a new layer to the network. New layer will get appended to m_lLayers.
@@ -92,14 +92,60 @@ public:
 	virtual void CreateNet(const ConTable<Type> &Net);
 
 	/**
-	 * @brief Implement to determine propagation behavior
+	 * Propagates through all neurons of the net beginning from the input layer.
+	 * Updates all neuron values of the network.
+	 *
+	 * The neuron output is defined as:
+	 * \f$
+	 * o_{j}=\varphi(\mbox{net}_{j})
+	 * \f$
+	 * , whereas the neuron input is defined as:
+	 * \f$
+	 * \mbox{net}_{j}=\sum\limits_{i=1}^{n} x_{i} w_{ij}.
+	 * \f$
+	 * \n
+	 * \f$
+	 * \\	\varphi\ \text{ is a differentiable activation function,}
+	 * \\	n \text{ is the number of inputs,}
+	 * \\	x_{i} \text{ is the input } i \text{ and}
+	 * \\	w_{ij} \text{ is the weight between neuron } i \text{ and neuron } j
+	 * \f$.
 	 */
-	virtual void PropagateFW() = 0;
+	virtual void PropagateFW();
 	
 	/**
-	 * @brief Implement to determine back propagation ( == learning ) behavior
+	 * Propagates through all neurons of the net beginning from the output layer. \n
+	 * Calculates error deltas of neurons from current learning output and training output data. \n
+	 * Also updates all weights of the net beginning from the output layer. \n
+	 * The backpropagation works as described below: \n \n
+	 * \f$
+	 * \\	\mbox{1. Is the neuron in the output layer, it takes part of the output,}
+	 * \\	\mbox{2. is the neuron in the hidden layer, the weight adaption could get calculated.}
+	 * \\	\mbox{	concrete:}
+	 *
+	 * \\	\Delta w_{ij}(t+1)= \eta \delta_{j} x_{i} + \alpha \Delta w_{ij}(t)
+	 *
+	 * \\	\mbox{	with}
+	 *
+	 * \\	\delta_{j}=\begin{cases}
+	 * 	\varphi'(\mbox{net}_{j})(t_{j}-o_{j}) & \mbox{if } j \mbox{ is an output neuron,}\\
+	 * 	\varphi'(\mbox{net}_{j}) \sum_{k} \delta_{k} w_{jk} & \mbox{if } j \mbox{ is an hidden neuron.}
+	 * 	\end{cases}
+	 *
+	 * \\ 	\mbox{	and}
+	 *
+	 * \\	\Delta w_{ij} \mbox{ is the change of the weight } w_{ij} \mbox{ of the connection }i\mbox{ to neuron }j\mbox{,}
+	 * \\	\eta \mbox{ is the learning rate, which regulates to amount of the weight change,}
+	 * \\	\delta_{j} \mbox{ is the error signal of the neuron } j mbox{,}
+	 * \\	x_{i} \mbox{ is the output of the neuron } i \mbox{,}
+	 * \\	t_{j} \mbox{ is the debit output of the output neuron } j \mbox{,}
+	 * \\	o_{j} \mbox{ is the actual output of the output neuron } j \mbox{ und}
+	 * \\	k \mbox{ is the index of the subsequent neurons of } j \mbox{.}
+	 * \\ 	\Delta w_{ij}(t+1) \mbox{ is the change of the weight } w_{ij}(t+1) \mbox{ of the connection of neuron } i \mbox{ to neuron } j \mbox{ at the time point (t+1),}
+	 * \\ 	\alpha \mbox{ is the influence of the momentum term } \Delta w_{ij}(t) \mbox{. Correlates with the weight change of the prior time point.}
+	 * \f$
 	 */
-	virtual void PropagateBW() = 0;
+	virtual void PropagateBW();
 
 	/**
 	 * @brief Sets the type of the net
@@ -145,14 +191,6 @@ public:
 	 * @param iLayerID Index of the layer in m_lLayers
 	 */
 	virtual void SetInput(const std::vector<Type> &inputArray, const unsigned int &iLayerID);
-	
-	/**
-	 * @brief Set the value of neurons in the input layer to new values
-	 * @param pInputArray New values of the input layer
-	 * @param iLayerID Index of the layer in m_lLayers
-	 * @param iSize Number of values in pInputArray
-	 */
-	virtual void SetInput(Type *pInputArray, const unsigned int &iSize, const unsigned int &iLayerID);
 
 	/**
 	 * @brief Set the values of the neurons equal to the values of the outputArray. Also calcs the error delta of each neuron in the output layer.
@@ -168,21 +206,7 @@ public:
 	 * @param iLayerID Index of the layer in m_lLayers
 	 */
 	virtual Type SetOutput(const std::vector<Type> &outputArray, const unsigned int &iLayerID);
-	
-	/**
-	 * @brief Set the values of the neurons equal to the values of the outputArray. Also calcs the error delta of each neuron in the output layer.
-	 * @return returns the total error of the output layer ( sum(pow(delta, 2)/2.f )
-	 * @param pOutputArray New values of the output layer
-	 * @param iSize Number of values in pInputArray
-	 * @param iLayerID Index of the layer in m_lLayers
-	 */
-	virtual Type SetOutput(Type *pOutputArray, const unsigned int &iSize, const unsigned int &iLayerID);
 
-	/**
-	 *  @brief Sets training data of the net.
-	 */
-	virtual void SetTrainingSet(const TrainingSet<Type> *pData);
-	
 	/**
 	 *  @brief Sets training data of the net.
 	 */
@@ -190,9 +214,9 @@ public:
 	
 	/**
 	 *  @brief Training data of the net.
-	 *  @return Returns the current training set of the net or NULL if nothing was set.
+	 *  @return Returns the current training set as a reference.
 	 */
-	virtual TrainingSet<Type> *GetTrainingSet() const;
+	virtual TrainingSet<Type> &GetTrainingSet();
 
 	/**
 	 * @brief Returns layer at index iLayerID.
@@ -248,10 +272,10 @@ public:
 
 template <class T>
 std::ostream& operator << (std::ostream &os, ANN::AbsNet<T> *op) {
-	assert( op->GetOPLayer() != NULL );
-	if( op->GetTrainingSet() != NULL ) {
-		for( unsigned int i = 0; i < op->GetTrainingSet()->GetNrElements(); i++ ) {
-			op->SetInput( op->GetTrainingSet()->GetInput(i) );
+	assert( op->GetOPLayer() != nullptr );
+	if( !op->GetTrainingSet().Empty() ) {
+		for( unsigned int i = 0; i < op->GetTrainingSet().GetNrElements(); i++ ) {
+			op->SetInput( op->GetTrainingSet().GetInput(i) );
 			op->PropagateFW();
 
 			for(unsigned int j = 0; j < op->GetOPLayer()->GetNeurons().size(); j++) {

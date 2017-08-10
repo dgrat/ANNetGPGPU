@@ -38,8 +38,7 @@ private:
 	std::vector<std::vector<Type> > m_vOutputList;
 
 public:
-	TrainingSet();
-	~TrainingSet();
+	virtual ~TrainingSet();
 
 	void AddInput(const std::vector<Type> &vIn);
 	void AddOutput(const std::vector<Type> &vOut);
@@ -47,6 +46,7 @@ public:
 	void AddOutput(Type *pOut, const unsigned int &iSize);
 
 	unsigned int GetNrElements() const;
+	bool Empty() const;
 
 	std::vector<Type> GetInput(const unsigned int &iID) const;
 	std::vector<Type> GetOutput(const unsigned int &iID) const;

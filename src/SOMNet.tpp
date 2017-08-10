@@ -217,9 +217,10 @@ void SOMNet<Type, Functor>::CreateSOM(	const uint32_t &iWidthI, const uint32_t &
 
 template<class Type, class Functor>
 void SOMNet<Type, Functor>::TrainHelper(uint32_t i) {
-	assert(i < this->GetTrainingSet()->GetNrElements() );
+	auto &trainingSet = this->GetTrainingSet();
+	assert(i < trainingSet.GetNrElements() );
 	
-	this->SetInput(this->GetTrainingSet()->GetInput(i) );
+	this->SetInput(trainingSet.GetInput(i) );
 
 	// Present the input vector to each node and determine the BMU
 	this->FindBMNeuron();
@@ -232,14 +233,15 @@ template<class Type, class Functor>
 void SOMNet<Type, Functor>::Training(const uint32_t &iCycles, const TrainingMode &eMode) {
 	assert(iCycles > 0);
 	
-	if(this->GetTrainingSet() == nullptr) {
+	auto &trainingSet = this->GetTrainingSet();
+	if(trainingSet.Empty()) {
 		ANN::printf("No training set available\n");
 		return;
 	}
 	
 	m_iCycles = iCycles;
 	int iMin = 0;
-	int iMax = this->GetTrainingSet()->GetNrElements()-1;
+	int iMax = trainingSet.GetNrElements()-1;
 	uint32_t iProgCount = 1;
 
 	ANN::printf("Start calculation now\n");
@@ -260,7 +262,7 @@ void SOMNet<Type, Functor>::Training(const uint32_t &iCycles, const TrainingMode
 		}
 		// The input vectors are presented to the network in serial order
 		else if(eMode == ANN::ANSerialMode) {
-			for(uint32_t i = 0; i < this->GetTrainingSet()->GetNrElements(); i++) {
+			for(uint32_t i = 0; i < trainingSet.GetNrElements(); i++) {
 				TrainHelper(i);
 			}
 		}
@@ -292,9 +294,10 @@ void SOMNet<Type, Functor>::PropagateBW() {
 template<class Type, class Functor>
 std::vector<Centroid<Type>> SOMNet<Type, Functor>::FindAllCentroids() {
 	std::vector<Centroid<Type>> vCentroids;
-	for(uint32_t i = 0; i < this->GetTrainingSet()->GetNrElements(); i++) {
+	auto &trainingSet = this->GetTrainingSet();
+	for(uint32_t i = 0; i < trainingSet.GetNrElements(); i++) {
 		// Present the input vector to each node and determine the BMU
-		this->SetInput(this->GetTrainingSet()->GetInput(i) );
+		this->SetInput(trainingSet.GetInput(i) );
 		FindBMNeuron();
 
 		Centroid<Type> centr;
@@ -302,17 +305,12 @@ std::vector<Centroid<Type>> SOMNet<Type, Functor>::FindAllCentroids() {
 		for(uint32_t j = 0; j < m_pBMNeuron->GetConsI().size(); j++) {
 			centr._edges.push_back(m_pBMNeuron->GetConI(j)->GetValue());
 		}
-		centr._input = this->GetTrainingSet()->GetInput(i);
+		centr._input = trainingSet.GetInput(i);
 		centr._distance = m_pBMNeuron->GetValue();
 		
 		vCentroids.push_back(centr);
 	}
 	return vCentroids;
-}
-
-template<class Type, class Functor>
-void SOMNet<Type, Functor>::PropagateFW() {
-	// TODO
 }
 
 template<class Type, class Functor>
